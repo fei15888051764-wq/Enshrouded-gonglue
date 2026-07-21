@@ -7,6 +7,7 @@ import PageLayout from './PageLayout';
 import { allBuilds, buildSubSections } from '../data/buildData';
 import { StatBar, SkillPriorityBadge } from '../data/buildData';
 import SectionGallery from '../components/SectionGallery';
+import SubPageHero from '../components/SubPageHero';
 import { buildsImages } from '../data/skillsBuildsImages';
 
 const DIFFICULTY_COLORS: Record<string, string> = {
@@ -133,6 +134,7 @@ export default function BuildSubPage({ subId }: BuildSubPageProps) {
         </div>
 
         {/* Build Header */}
+        <SubPageHero images={buildsImages[build.id]} />
         <div className="max-w-4xl">
           <div className="game-panel corner-decor p-6 mb-6">
             <div className="flex flex-wrap items-start gap-4 mb-4">
@@ -291,7 +293,7 @@ export default function BuildSubPage({ subId }: BuildSubPageProps) {
           </SectionToggle>
 
           {/* Build Gallery */}
-          <SectionGallery images={buildsImages[build.id]} />
+          <SectionGallery images={buildsImages[build.id]} skipFirst />
         </div>
 
         {/* Navigation */}
