@@ -6,6 +6,7 @@ import {
 import PageLayout from './PageLayout';
 import { allArmor, armorSubSections, TIER_COLORS, TYPE_COLORS } from '../data/armorData';
 import SectionGallery from '../components/SectionGallery';
+import SubPageHero from '../components/SubPageHero';
 import { armorTierImages } from '../data/tipsUpdatesTroubleArmorImages';
 
 interface ArmorSubPageProps {
@@ -109,6 +110,7 @@ export default function ArmorSubPage({ subId }: ArmorSubPageProps) {
           <span className="text-[var(--text-gold)]">{armor.name}</span>
         </div>
 
+        <SubPageHero images={armorTierImages[armor.tier]} />
         <div className="max-w-4xl">
           {/* Armor Header */}
           <div className="game-panel corner-decor p-6 mb-6">
@@ -232,7 +234,7 @@ export default function ArmorSubPage({ subId }: ArmorSubPageProps) {
             </div>
           </SectionToggle>
 
-          <SectionGallery images={armorTierImages[armor.tier]} />
+          <SectionGallery images={armorTierImages[armor.tier]} skipFirst />
         </div>
 
         {/* Navigation */}
