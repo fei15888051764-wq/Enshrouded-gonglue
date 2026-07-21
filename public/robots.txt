@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /private/
+Disallow: /admin/
+
+Sitemap: https://a7ifouohujb5q.ok.kimi.link/sitemap.xml
