@@ -1,23 +1,26 @@
 /**
- * Cloudflare Pages middleware — makes the site domain-agnostic.
+ * Cloudflare Pages middleware.
  *
- * 1. Redirects www.* to the bare apex domain (301) so Google sees a
- *    single canonical host.
- * 2. Rewrites the placeholder preview domain in HTML, sitemap.xml and
- *    robots.txt to whatever hostname the site is actually served from.
- *    Binding a custom domain in Cloudflare Pages therefore requires
- *    ZERO code changes — every canonical, OG, schema.org and sitemap
- *    URL automatically uses the live domain.
+ * 1. Host consolidation (301, permanent):
+ *    - www.enshroudedhub.com        -> enshroudedhub.com
+ *    - enshrouded-gonglue.pages.dev -> enshroudedhub.com
+ *    Google sees a single canonical host; all SEO value consolidates
+ *    on the custom domain.
+ * 2. Placeholder-domain rewrite: swaps the build-time placeholder origin
+ *    in HTML / sitemap.xml / robots.txt for the actual request origin,
+ *    so canonical, OG, schema.org and sitemap URLs always match the
+ *    live domain.
  */
 
 const PLACEHOLDER_ORIGIN = 'https://a7ifouohujb5q.ok.kimi.link';
+const CANONICAL_HOST = 'enshroudedhub.com';
 
 export async function onRequest(context) {
   const url = new URL(context.request.url);
 
-  // 1. Unify host: www.example.com -> example.com (permanent)
-  if (url.hostname.startsWith('www.')) {
-    url.hostname = url.hostname.slice(4);
+  // 1. One canonical host: redirect www.* and the legacy pages.dev subdomain
+  if (url.hostname.startsWith('www.') || url.hostname.endsWith('.pages.dev')) {
+    url.hostname = CANONICAL_HOST;
     return Response.redirect(url.toString(), 301);
   }
 
