@@ -95,4 +95,25 @@ export const buildsImages: Record<string, GalleryImage[]> = {
     { src: `${W}/blazing-wand.webp`, caption: 'Blazing Wand — your first fire wand', contain: true },
     { src: `${W}/blackened-staff.webp`, caption: 'Blackened Staff — graduate to full firepower', contain: true },
   ],
+  'tank': [
+    { src: '/images/beginner/combat-parry.webp', caption: "Tank builds live on perfect parries and huge health pools." },
+    { src: '/images/beginner/skill-tree-full.webp', caption: "Invest deep into defense and stamina nodes." },
+  ],
+  'melee-dps': [
+    { src: '/images/beginner/combat-dodge.webp', caption: "Melee DPS builds weave dodges into relentless offense." },
+    { src: '/images/beginner/combat-parry.webp', caption: "Parry windows open enemies up for devastating counters." },
+  ],
+  'ranged-dps': [
+    { src: '/images/beginner/skill-tree-ranger.webp', caption: "Ranger nodes maximize bow and crit damage." },
+    { src: '/images/beginner/night-monster-fight.webp', caption: "Kite enemies and rain arrows from safe ground." },
+  ],
+  'magic-dps': [
+    { src: '/images/beginner/combat-mage-lightning.webp', caption: "Mage builds melt packs with elemental spells." },
+    { src: '/images/beginner/skill-tree-mage.webp', caption: "Stack intelligence and magic-focused nodes." },
+  ],
+  'support': [
+    { src: '/images/beginner/multiplayer-coop.webp', caption: "Support builds keep a full party alive through endgame fights." },
+    { src: '/images/beginner/village-npcs.webp', caption: "Buffs, heals, and auras — the backbone of co-op." },
+  ],
+
 };
