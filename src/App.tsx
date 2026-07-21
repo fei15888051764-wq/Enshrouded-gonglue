@@ -12,10 +12,15 @@ import QuestsSubPage from './pages/QuestsSubPage';
 import SkillsHomePage from './pages/SkillsHomePage';
 import SkillsSubPage from './pages/SkillsSubPage';
 import ItemsHomePage from './pages/ItemsHomePage';
+import ItemsSubPage from './pages/ItemsSubPage';
 import CraftingHomePage from './pages/CraftingHomePage';
+import CraftingSubPage from './pages/CraftingSubPage';
 import EnemiesHomePage from './pages/EnemiesHomePage';
+import EnemiesSubPage from './pages/EnemiesSubPage';
 import BossesHomePage from './pages/BossesHomePage';
+import BossesSubPage from './pages/BossesSubPage';
 import BossDetailPage from './pages/BossDetailPage';
+import { bossesSubSections } from './data/bossesData';
 import MapHomePage from './pages/MapHomePage';
 import MapSubPage from './pages/MapSubPage';
 import BaseHomePage from './pages/BaseHomePage';
@@ -36,6 +41,8 @@ import BuildHomePage from './pages/BuildHomePage';
 import BuildSubPage from './pages/BuildSubPage';
 import ArmorHomePage from './pages/ArmorHomePage';
 import ArmorSubPage from './pages/ArmorSubPage';
+import ScreenshotsHomePage from './pages/ScreenshotsHomePage';
+import ScreenshotsSubPage from './pages/ScreenshotsSubPage';
 import AboutPage from './pages/AboutPage';
 import DisclaimerPage from './pages/DisclaimerPage';
 import PrivacyPage from './pages/PrivacyPage';
@@ -90,15 +97,23 @@ const categoryHomePages: Record<string, React.ComponentType> = {
   troubleshoot: TroubleshootHomePage,
   builds: BuildHomePage,
   armor: ArmorHomePage,
+  screenshots: ScreenshotsHomePage,
 };
 
 const categorySubPages: Record<string, React.ComponentType<{ subId: string }>> = {
-  bosses: ({ subId }: { subId: string }) => <BossDetailPage bossName={subId} />,
+  // Bosses has two page types sharing /bosses/:sub — guide subsections
+  // (early-bosses, boss-strategies…) vs individual boss detail pages
+  bosses: ({ subId }: { subId: string }) =>
+    bossesSubSections.some((s) => s.id === subId)
+      ? <BossesSubPage subId={subId} />
+      : <BossDetailPage bossName={subId} />,
   lore: LoreSubPage,
   beginner: BeginnerSubPage,
   quests: QuestsSubPage,
   skills: SkillsSubPage,
-  crafting: CraftingHomePage,
+  items: ItemsSubPage,
+  crafting: CraftingSubPage,
+  enemies: EnemiesSubPage,
   map: MapSubPage,
   base: BaseSubPage,
   mechanics: MechanicsSubPage,
@@ -109,6 +124,7 @@ const categorySubPages: Record<string, React.ComponentType<{ subId: string }>> =
   troubleshoot: TroubleshootSubPage,
   builds: BuildSubPage,
   armor: ArmorSubPage,
+  screenshots: ScreenshotsSubPage,
 };
 
 function NotFoundPage() {

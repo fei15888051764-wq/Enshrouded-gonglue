@@ -63,6 +63,7 @@ const SECTION_NAMES: Record<string, string> = {
   base: 'Base Building',
   mechanics: 'Game Mechanics',
   troubleshoot: 'Troubleshooting',
+  screenshots: 'Game Screenshots',
 };
 
 const groups: [string, SubEntry[]][] = [
@@ -104,6 +105,7 @@ const SECTION_KEYWORDS: Record<string, string[]> = {
   lore: ['lore', 'story', 'history'],
   items: ['item', 'material', 'ore', 'where to find'],
   crafting: ['craft', 'crafting', 'recipe', 'station'],
+  screenshots: ['screenshot', 'screenshots', 'photo', 'picture', 'image', 'gallery', 'wallpaper', 'photo mode', 'camera'],
   enemies: ['enemy', 'creature', 'monster', 'mob'],
   armor: ['armor', 'armour', 'set', 'gear', 'defense'],
   walkthrough: ['walkthrough', 'chapter', 'progression', 'guide'],
