@@ -1,3 +1,32 @@
+// Global search index — auto-generated from the site's actual data files.
+// Covers: all 20 sections, every subsection page, all 345 weapons,
+// all armor sets, and all 13 boss detail pages.
+// New content added to any *SubSections data file becomes searchable
+// automatically — this index never goes stale.
+
+import Fuse, { type FuseResult } from 'fuse.js';
+
+import { armorSubSections, sTierArmor, aTierArmor, bTierArmor, cTierArmor } from './armorData';
+import { baseSubSections } from './baseData';
+import { beginnerSubSections } from './beginnerData';
+import { bossesSubSections } from './bossesData';
+import { buildSubSections } from './buildData';
+import { craftingSubSections } from './craftingData';
+import { enemiesSubSections } from './enemiesData';
+import { fishingSubSections } from './fishingData';
+import { itemsSubSections } from './itemsData';
+import { loreSubSections } from './loreData';
+import { mapSubSections } from './mapData';
+import { mechanicsSubSections } from './mechanicsData';
+import { questsSubSections } from './questsData';
+import { skillsSubSections } from './skillsData';
+import { tipsSubSections } from './tipsData';
+import { troubleshootSubSections } from './troubleshootData';
+import { updatesSubSections } from './updatesData';
+import { walkthroughSubSections } from './walkthroughData';
+import { bossDetails } from './bossDetailData';
+import weaponsData from './weapons.json';
+
 export interface SearchItem {
   id: string;
   title: string;
@@ -5,139 +34,212 @@ export interface SearchItem {
   description: string;
   keywords: string[];
   route: { page: string; sub?: string };
+  /** Direct path (used for query-string deep links, e.g. prefiltered weapon DB) */
+  href?: string;
 }
 
-export const searchIndex: SearchItem[] = [
-  // === TIPS & TRICKS (10 subsections) ===
-  { id: 'tips', title: 'Tips & Tricks', category: 'Section', description: 'Complete tips and tricks guide for Enshrouded', keywords: ['tips', 'tricks', 'guide', 'help'], route: { page: 'tips' } },
-  { id: 'tips-beginner', title: 'Beginner Tips', category: 'Tips & Tricks', description: 'Essential tips for your first 10 hours — NPC rescue priorities, early game mistakes to avoid', keywords: ['beginner', 'new player', 'start', 'npc', 'blacksmith', 'glider', 'grappling hook', 'food buff', 'repair', 'skill points', 'flame', 'shroud', 'mistakes'], route: { page: 'tips', sub: 'beginner-tips' } },
-  { id: 'tips-combat', title: 'Combat Mastery', category: 'Tips & Tricks', description: 'Complete combat guide — blocking, dodging, elemental weaknesses, weapon types, boss strategies', keywords: ['combat', 'fight', 'block', 'dodge', 'parry', 'elemental', 'fire', 'ice', 'lightning', 'weapon', 'sword', 'axe', 'bow', 'staff', 'wand', 'boss', 'backstab'], route: { page: 'tips', sub: 'combat-tips' } },
-  { id: 'tips-exploration', title: 'Exploration & Movement', category: 'Tips & Tricks', description: 'Master exploration with Glider mechanics, Grappling Hook tricks, Ancient Spire routes', keywords: ['explore', 'glider', 'grappling hook', 'ancient spire', 'fast travel', 'flame altar', 'hidden area', 'movement', 'traverse'], route: { page: 'tips', sub: 'exploration' } },
-  { id: 'tips-base', title: 'Base Building Guide', category: 'Tips & Tricks', description: 'Complete base building guide — location selection, Comfort mechanics, construction systems', keywords: ['base', 'building', 'comfort', 'crafting hub', 'storage', 'bedroom', 'framework', 'support', 'roof', 'decoration'], route: { page: 'tips', sub: 'base-building' } },
-  { id: 'tips-crafting', title: 'Crafting & Equipment', category: 'Tips & Tricks', description: 'Crafting, equipment tiers, tool upgrades, armor sets, inventory management, legendary loot', keywords: ['craft', 'equipment', 'gear', 'armor', 'weapon', 'upgrade', 'tool', 'pickaxe', 'axe', 'legendary', 'rarity', 'inventory', 'chest', 'gem', 'socket'], route: { page: 'tips', sub: 'crafting-gear' } },
-  { id: 'tips-builds', title: 'Character Builds & Skills', category: 'Tips & Tricks', description: 'Attribute allocation, skill trees, recommended builds for every playstyle, respeccing strategies', keywords: ['build', 'skill', 'attribute', 'strength', 'dexterity', 'intelligence', 'constitution', 'endurance', 'spirit', 'respec', 'tank', 'berserker', 'ranger', 'mage'], route: { page: 'tips', sub: 'character-builds' } },
-  { id: 'tips-shroud', title: 'Shroud & Survival Mechanics', category: 'Tips & Tricks', description: 'Deep dive into the Shroud system — survival timers, death mechanics, Flame upgrades, Campfire placement', keywords: ['shroud', 'survival', 'timer', 'death', 'respawn', 'flame upgrade', 'spark', 'shroud core', 'shroud root', 'campfire', 'safe zone'], route: { page: 'tips', sub: 'shroud-survival' } },
-  { id: 'tips-farming', title: 'Farming & Efficiency', category: 'Tips & Tricks', description: 'Optimized farming routes for materials, XP, Runes, and legendaries', keywords: ['farm', 'xp', 'rune', 'boss farm', 'hollow halls', 'legendary', 'material', 'gather', 'route', 'efficiency'], route: { page: 'tips', sub: 'farming-efficiency' } },
-  { id: 'tips-multiplayer', title: 'Co-op & Multiplayer', category: 'Tips & Tricks', description: 'Co-op mechanics, shared resources, role specialization, communication strategies', keywords: ['coop', 'multiplayer', 'co-op', 'team', 'friend', 'shared', 'role', 'tank', 'healer', 'dps', 'revive'], route: { page: 'tips', sub: 'multiplayer' } },
-  { id: 'tips-secrets', title: 'Secrets & Hidden Mechanics', category: 'Tips & Tricks', description: 'Hidden areas, secret items, developer references, hidden game mechanics', keywords: ['secret', 'hidden', 'easter egg', 'developer', 'roll cancel', 'wall jump', 'chest refresh', 'undocumented'], route: { page: 'tips', sub: 'secrets-easter-eggs' } },
-  { id: 'tips-cooking', title: 'Cooking & Food Buffs', category: 'Tips & Tricks', description: 'Complete food system guide — 8 ingredient categories, buff effects, cooking stations, recipes', keywords: ['cooking', 'food', 'buff', 'recipe', 'meat', 'fish', 'vegetable', 'mushroom', 'grain', 'herb', 'fruit', 'sweet', 'drink', 'oven', 'smoker'], route: { page: 'tips', sub: 'cooking-food' } },
-  { id: 'tips-alchemy', title: 'Alchemy & Potions', category: 'Tips & Tricks', description: 'Healing potions, Shroud flasks, buff potions, mana management, explosive powder', keywords: ['alchemy', 'potion', 'heal', 'mana', 'shroud flask', 'explosive powder', 'staff charge', 'alchemist'], route: { page: 'tips', sub: 'alchemy-potions' } },
-  { id: 'tips-agriculture', title: 'Farming & Agriculture', category: 'Tips & Tricks', description: 'Crop types, soil preparation, Seedbed mechanics, animal taming, barn building', keywords: ['agriculture', 'farm', 'crop', 'seed', 'seedbed', 'animal', 'tame', 'barn', 'flax', 'farmer'], route: { page: 'tips', sub: 'farming-agriculture' } },
-  { id: 'tips-fishing', title: 'Fishing Guide', category: 'Tips & Tricks', description: 'Fishing rods, bait types, mini-game, fish locations by biome', keywords: ['fishing', 'fish', 'rod', 'bait', 'frog', 'worm', 'firefly', 'cook', 'sieve', 'underwater'], route: { page: 'tips', sub: 'fishing' } },
-  { id: 'tips-update7', title: 'Update 7: Wake of the Water', category: 'Tips & Tricks', description: 'Swimming, diving, Veilwater Basin, greatswords, fishing, water building', keywords: ['update 7', 'swim', 'dive', 'veilwater', 'greatsword', 'water building', 'water pump', 'water wheel'], route: { page: 'tips', sub: 'update7-water' } },
-  { id: 'tips-performance', title: 'Performance & Settings', category: 'Tips & Tricks', description: 'Graphics settings, FPS fixes, CPU/VRAM tweaks, traversal stutter solutions', keywords: ['performance', 'fps', 'settings', 'graphics', 'optimize', 'stutter', 'lag', 'dlss', 'fsr', 'vram', 'shader'], route: { page: 'tips', sub: 'performance' } },
+interface SubEntry { id: string; title: string; summary?: string; description?: string }
 
-  // === PATCH NOTES (11 subsections) ===
-  { id: 'updates', title: 'Patch Notes', category: 'Section', description: 'Complete patch notes history from Early Access to present', keywords: ['patch', 'update', 'changelog', 'hotfix', 'version'], route: { page: 'updates' } },
-  { id: 'updates-launch', title: 'Early Access Launch', category: 'Patch Notes', description: 'The original Early Access release on January 24, 2024', keywords: ['launch', 'early access', 'v0.7.0', 'january 2024', 'release'], route: { page: 'updates', sub: 'early-access-launch' } },
-  { id: 'updates-u1', title: 'Update 1: Hollow Halls', category: 'Patch Notes', description: 'First major content update — Hollow Halls dungeons, new enemies, round doors', keywords: ['update 1', 'hollow halls', 'dungeon', 'v0.7.1', 'march 2024', 'sitting'], route: { page: 'updates', sub: 'update1-hollow-halls' } },
-  { id: 'updates-u2', title: 'Update 2: Melodies of the Mire', category: 'Patch Notes', description: 'June 2024 update — Blackmire swamp expansion', keywords: ['update 2', 'melodies', 'mire', 'blackmire', 'v0.7.2', 'june 2024'], route: { page: 'updates', sub: 'update2-melodies-mire' } },
-  { id: 'updates-u3', title: 'Back to the Shroud', category: 'Patch Notes', description: 'July 2024 update — Shroud improvements and summer event', keywords: ['back to shroud', 'v0.7.3', 'july 2024', 'summer event'], route: { page: 'updates', sub: 'back-to-shroud' } },
-  { id: 'updates-u4', title: 'Update 3: Pact of the Flame', category: 'Patch Notes', description: 'January 2025 — skill individual reset, building block decay, 70+ new props', keywords: ['update 3', 'pact of the flame', 'v0.8.0', 'january 2025', 'skill reset', 'decay', 'parry'], route: { page: 'updates', sub: 'update3-pact-flame' } },
-  { id: 'updates-u5', title: 'Update 5: Souls of the Frozen Frontier', category: 'Patch Notes', description: 'September 2024 — Albaneve Summits biome, dynamic weather, cold mechanics', keywords: ['update 5', 'frozen frontier', 'albaneve', 'v0.7.4', 'september 2024', 'snow', 'cold', 'obsidian'], route: { page: 'updates', sub: 'update5-frozen-frontier' } },
-  { id: 'updates-u6', title: 'Update 6: Thralls of Twilight', category: 'Patch Notes', description: 'May 2025 — Weapon Gem system, Shroud visual overhaul, Night Temples, Barber', keywords: ['update 6', 'thralls', 'twilight', 'v0.8.1', 'may 2025', 'weapon gem', 'night temple', 'barber'], route: { page: 'updates', sub: 'update6-thralls-twilight' } },
-  { id: 'updates-u7', title: 'Update 7: Wake of the Water', category: 'Patch Notes', description: 'November 2025 — swimming, Veilwater Basin, greatswords, fishing, water building', keywords: ['update 7', 'wake of the water', 'v0.9.0', 'november 2025', 'swim', 'veilwater', 'fishing'], route: { page: 'updates', sub: 'update7-wake-water' } },
-  { id: 'updates-u8', title: 'Update 8: Forging the Path', category: 'Patch Notes', description: 'May 2026 — Adventure Sharing, Focus/Special Abilities, heavy attacks, skill tree revamp', keywords: ['update 8', 'forging the path', 'v0.9.1', 'may 2026', 'adventure sharing', 'focus', 'heavy attack', 'quick stack'], route: { page: 'updates', sub: 'update8-forging-path' } },
-  { id: 'updates-inter', title: 'Update 4: Inter-Update Period', category: 'Patch Notes', description: 'Technical improvements between major content drops', keywords: ['update 4', 'inter-update', 'technical', 'backend'], route: { page: 'updates', sub: 'update4-unmarked' } },
-  { id: 'updates-roadmap', title: 'Roadmap & Future', category: 'Patch Notes', description: '2026 roadmap, 1.0 release plans, console versions', keywords: ['roadmap', 'future', '1.0', 'console', 'ps5', 'xbox', '2026', '2027'], route: { page: 'updates', sub: 'roadmap-future' } },
+const SECTION_NAMES: Record<string, string> = {
+  beginner: "Beginner's Guide",
+  skills: 'Skills & Builds',
+  builds: 'Character Builds',
+  weaponsdb: 'Weapons',
+  'armor-pieces': 'Armor Pieces',
+  armor: 'Armor Sets',
+  items: 'Items & Materials',
+  crafting: 'Crafting',
+  bosses: 'Bosses',
+  enemies: 'Enemies',
+  map: 'Map & Locations',
+  quests: 'Quests',
+  lore: 'Lore & Story',
+  walkthrough: 'Walkthrough',
+  tips: 'Tips & Tricks',
+  updates: 'Patch Notes',
+  fishing: 'Fishing',
+  base: 'Base Building',
+  mechanics: 'Game Mechanics',
+  troubleshoot: 'Troubleshooting',
+};
 
-  // === TROUBLESHOOTING (11 subsections) ===
-  { id: 'troubleshoot', title: 'Troubleshooting', category: 'Section', description: 'Fix crashes, lag, connection issues, and technical problems', keywords: ['troubleshoot', 'fix', 'crash', 'error', 'bug', 'problem', 'solution'], route: { page: 'troubleshoot' } },
-  { id: 'tr-launch', title: 'Launch & Crash Fixes', category: 'Troubleshooting', description: 'Game won\'t start, black screen, crash on startup, Graphics System errors', keywords: ['launch', 'crash', 'black screen', 'startup', 'graphics system', 'vulkan', 'minidump', 'intel arc', 'overclock', 'twitch studio'], route: { page: 'troubleshoot', sub: 'launch-crash' } },
-  { id: 'tr-perf', title: 'Performance & FPS Optimization', category: 'Troubleshooting', description: 'Low FPS, stuttering, shader compilation stutter, VRAM issues', keywords: ['fps', 'performance', 'stutter', 'lag', 'shader', 'optimize', 'settings', 'dlss', 'fsr', 'vr'], route: { page: 'troubleshoot', sub: 'performance-fps' } },
-  { id: 'tr-mp', title: 'Multiplayer & Connection', category: 'Troubleshooting', description: 'Can\'t connect to friends, lag, disconnects, server issues', keywords: ['multiplayer', 'connection', 'server', 'port forward', 'firewall', 'version mismatch', 'timeout', 'relay'], route: { page: 'troubleshoot', sub: 'multiplayer-issues' } },
-  { id: 'tr-save', title: 'Save Data & Recovery', category: 'Troubleshooting', description: 'Save corruption, world rollback, data loss prevention, backup strategies', keywords: ['save', 'corruption', 'backup', 'recover', 'data loss', 'world reset'], route: { page: 'troubleshoot', sub: 'save-data' } },
-  { id: 'tr-gpu', title: 'GPU & Graphics Issues', category: 'Troubleshooting', description: 'Texture corruption, black textures, VRAM crashes, world assets not loading', keywords: ['gpu', 'graphics', 'texture', 'black texture', 'vram', 'amd', 'nvidia', 'intel', 'asset'], route: { page: 'troubleshoot', sub: 'gpu-graphics' } },
-  { id: 'tr-audio', title: 'Audio & Input Issues', category: 'Troubleshooting', description: 'No sound, audio cutting out, controller not working, key binding issues', keywords: ['audio', 'sound', 'controller', 'input', 'keyboard', 'mouse', 'key bind', 'microphone'], route: { page: 'troubleshoot', sub: 'audio-input' } },
-  { id: 'tr-deck', title: 'Steam Deck & Linux', category: 'Troubleshooting', description: 'Steam Deck settings, Proton versions, Linux server issues', keywords: ['steam deck', 'linux', 'proton', 'portable', 'cryoutilities'], route: { page: 'troubleshoot', sub: 'steam-deck-linux' } },
-  { id: 'tr-server', title: 'Dedicated Server Guide', category: 'Troubleshooting', description: 'Complete dedicated server setup, configuration, port forwarding', keywords: ['dedicated server', 'host', 'port forward', 'ram', 'config', 'json', 'firewall'], route: { page: 'troubleshoot', sub: 'server-setup' } },
-  { id: 'tr-errors', title: 'Common Error Codes', category: 'Troubleshooting', description: 'Specific error messages and step-by-step fixes for each known error', keywords: ['error code', 'error 5', 'ue4', 'unreal engine', 'graphics system', 'version old', 'timeout', 'overloaded'], route: { page: 'troubleshoot', sub: 'common-errors' } },
-  { id: 'tr-maint', title: 'General Maintenance', category: 'Troubleshooting', description: 'Regular maintenance tasks, update procedures, best practices', keywords: ['maintenance', 'weekly', 'checklist', 'update', 'verify', 'backup'], route: { page: 'troubleshoot', sub: 'general-maintenance' } },
-  { id: 'tr-stuck', title: 'Stuck & Freeze Issues', category: 'Troubleshooting', description: 'Infinite loading screens, getting stuck falling, game freezing, white screen', keywords: ['stuck', 'freeze', 'infinite loading', 'white screen', 'loading screen', 'falling', 'terrain'], route: { page: 'troubleshoot', sub: 'stuck-freeze' } },
-
-  // === CHARACTER BUILDS (7 builds) ===
-  { id: 'builds', title: 'Character Builds', category: 'Section', description: 'S-tier meta builds with full skill trees, gear, and strategies', keywords: ['build', 'character build', 'class', 'archetype', 'ranger', 'mage', 'tank', 'dps'], route: { page: 'builds' } },
-  { id: 'build-ranger', title: 'Ranger Sniper Build', category: 'Character Builds', description: 'S-Tier ranged DPS — Fatal Precision + Explosive Arrow AOE', keywords: ['ranger', 'archer', 'bow', 'sniper', 'dexterity', 'ranged', 'dps'], route: { page: 'builds', sub: 'ranger-sniper' } },
-  { id: 'build-assassin', title: 'Assassin Build', category: 'Character Builds', description: 'A-Tier stealth burst — Dual blades, backstab, poison DOT', keywords: ['assassin', 'rogue', 'dagger', 'stealth', 'backstab', 'poison', 'dexterity'], route: { page: 'builds', sub: 'assassin-dual-blades' } },
-  { id: 'build-wizard', title: 'Wizard Build', category: 'Character Builds', description: 'A-Tier glass cannon — Arsonist + Pyromaniac +30% fire damage', keywords: ['wizard', 'mage', 'glass cannon', 'fire', 'spell', 'intelligence', 'magic'], route: { page: 'builds', sub: 'wizard-glass-cannon' } },
-  { id: 'build-battlemage', title: 'Battlemage Build', category: 'Character Builds', description: 'A-Tier hybrid — Heavy armor melee mage with Wand Master', keywords: ['battlemage', 'hybrid', 'wand', 'shield', 'melee mage', 'intelligence'], route: { page: 'builds', sub: 'battlemage-hybrid' } },
-  { id: 'build-berserker', title: 'Berserker Build', category: 'Character Builds', description: 'A-Tier melee DPS — Blood Rage +20% damage, Breach 2x damage', keywords: ['berserker', 'barbarian', 'two-handed', 'strength', 'blood rage', 'melee'], route: { page: 'builds', sub: 'berserker-barbarian' } },
-  { id: 'build-tank', title: 'Tank Build', category: 'Character Builds', description: 'S-Tier tank — Earth Aura + Heavy Plates, self-sustaining', keywords: ['tank', 'shield', 'sword and board', 'constitution', 'earth aura', 'heal'], route: { page: 'builds', sub: 'tank-sword-board' } },
-  { id: 'build-healer', title: 'Healer Support Build', category: 'Character Builds', description: 'A-Tier support — Water Aura 15m passive heal, Chain Heal', keywords: ['healer', 'support', 'water aura', 'chain heal', 'spirit', 'team', 'buff'], route: { page: 'builds', sub: 'healer-support' } },
-
-  // === ARMOR TIER LIST ===
-  { id: 'armor', title: 'Armor Tier List', category: 'Section', description: 'Complete S/A/B/C ranking of all armor sets', keywords: ['armor', 'armour', 'tier list', 'defense', 'heavy armor', 'light armor', 'medium armor', 'set bonus'], route: { page: 'armor' } },
-  { id: 'armor-s', title: 'S-Tier Armor', category: 'Armor Tier List', description: 'Best armor sets for endgame — highest defense and set bonuses', keywords: ['s-tier armor', 'best armor', 'endgame armor', 'legendary armor'], route: { page: 'armor', sub: 's-tier-armor' } },
-  { id: 'armor-a', title: 'A-Tier Armor', category: 'Armor Tier List', description: 'Excellent armor sets with strong stats', keywords: ['a-tier armor', 'good armor', 'strong defense'], route: { page: 'armor', sub: 'a-tier-armor' } },
-  { id: 'armor-b', title: 'B-Tier Armor', category: 'Armor Tier List', description: 'Solid mid-game armor sets', keywords: ['b-tier armor', 'mid game armor'], route: { page: 'armor', sub: 'b-tier-armor' } },
-  { id: 'armor-c', title: 'C-Tier Armor', category: 'Armor Tier List', description: 'Early-game or niche armor', keywords: ['c-tier armor', 'starter armor', 'early game'], route: { page: 'armor', sub: 'c-tier-armor' } },
-
-  // === WEAPON DATABASE ===
-  { id: 'weaponsdb', title: 'Weapon Database', category: 'Section', description: 'Complete database of all 293 weapons with stats and perks', keywords: ['weapon database', 'all weapons', 'weapon list', 'weapon catalog', 'legendary weapons'], route: { page: 'weaponsdb' } },
-
-  // === FISHING SYSTEM (7 subsections) ===
-  { id: 'fishing', title: 'Fishing System', category: 'Section', description: 'Complete fishing guide — rods, bait, all fish species, locations, tips', keywords: ['fishing', 'fish', 'rod', 'bait', 'catch', 'update 7', 'water'], route: { page: 'fishing' } },
-  { id: 'fish-start', title: 'Fishing: Getting Started', category: 'Fishing System', description: 'How to unlock fishing, controls, mini-game mechanics', keywords: ['fishing unlock', 'how to fish', 'fishing controls', 'mini game', 'tutorial'], route: { page: 'fishing', sub: 'getting-started' } },
-  { id: 'fish-rods', title: 'Fishing Rods', category: 'Fishing System', description: 'All 5 fishing rods — Simple, Cursed, Improved, Lucky, Excellent', keywords: ['fishing rod', 'rod tier', 'best rod', 'cursed rod', 'excellent rod'], route: { page: 'fishing', sub: 'rods' } },
-  { id: 'fish-bait', title: 'Fishing Bait', category: 'Fishing System', description: 'All bait types — wild insects and crafted bait recipes', keywords: ['bait', 'fire fly', 'moth', 'grasshopper', 'scarab', 'frog', 'bait recipe'], route: { page: 'fishing', sub: 'bait' } },
-  { id: 'fish-species', title: 'All Fish Species', category: 'Fishing System', description: 'Complete fish encyclopedia — 13 species with rarity and uses', keywords: ['fish species', 'rare fish', 'epic fish', 'carp', 'trout', 'salmon', 'eel'], route: { page: 'fishing', sub: 'fish' } },
-  { id: 'fish-locations', title: 'Fishing Locations', category: 'Fishing System', description: 'Best fishing spots across all biomes and secret locations', keywords: ['fishing spot', 'location', 'biome', 'secret fishing', 'best place to fish'], route: { page: 'fishing', sub: 'locations' } },
-  { id: 'fish-tips', title: 'Fishing Tips & Tricks', category: 'Fishing System', description: 'Advanced techniques to catch rare fish efficiently', keywords: ['fishing tip', 'rare fish', 'technique', 'efficiency', 'advanced'], route: { page: 'fishing', sub: 'tips' } },
-  { id: 'fish-rewards', title: 'Fishing Rewards', category: 'Fishing System', description: 'What to do with caught fish — cooking, trading, achievements', keywords: ['fish cooking', 'fish trade', 'reward', 'achievement', 'recipe'], route: { page: 'fishing', sub: 'rewards' } },
-
-  // === MAP & LOCATIONS (64 key locations, 6 biomes) ===
-  { id: 'map', title: 'Map & Locations', category: 'Section', description: 'Interactive location database — 64 key locations, 6 biomes, 1,017 mapped POIs', keywords: ['map', 'location', 'world', 'embervale', 'poi', 'where is', 'database'], route: { page: 'map' } },
-  { id: 'map-overview', title: 'Map Overview', category: 'Map & Locations', description: 'Complete world map — 1,017 markers, 43 categories, biome progression order', keywords: ['map overview', 'markers', 'categories', 'progression', 'interactive map', 'pindrop'], route: { page: 'map', sub: 'map-overview' } },
-  { id: 'map-springlands', title: 'Springlands', category: 'Map & Locations', description: 'Starter biome Lv 1-10 — 139 markers, 5 Ancient Vaults, 2 bosses, Low Meadows', keywords: ['springlands', 'starter', 'beginner zone', 'low meadows', 'cinder vault', 'blacksmith vault', 'fell thunderbrute', 'scavenger matron', 'farming'], route: { page: 'map', sub: 'biome-springlands' } },
-  { id: 'map-revelwood', title: 'Revelwood & Blackmire', category: 'Map & Locations', description: 'Forest biome Lv 10-15 — 486 markers, Pikemead\'s Reach capital, Blackmire swamp', keywords: ['revelwood', 'blackmire', 'forest', 'pikemead', 'capital', 'wispwyvern', 'the pike', 'mistbury catacombs'], route: { page: 'map', sub: 'biome-revelwood' } },
-  { id: 'map-nomad', title: 'Nomad Highlands', category: 'Map & Locations', description: 'Limestone bluffs Lv 15-20 — 324 markers, Umber Hollow, Vukah Arena, Pillars of Creation', keywords: ['nomad highlands', 'umber hollow', 'vukah', 'arena', 'pillars of creation', 'rattlebleak', 'jasper isles', 'brightwich'], route: { page: 'map', sub: 'biome-nomad-highlands' } },
-  { id: 'map-kindlewastes', title: 'Kindlewastes', category: 'Map & Locations', description: 'Desert biome Lv 20-30 — 262 markers, all 5 Sun Temples, iron mines', keywords: ['kindlewastes', 'desert', 'sun temple', 'haunted sun temple', 'fell sicklescythe', 'iron', 'ternion mine', 'ridgeback mine', 'lapis'], route: { page: 'map', sub: 'biome-kindlewastes' } },
-  { id: 'map-albaneve', title: 'Albaneve Summits', category: 'Map & Locations', description: 'Frozen peaks Lv 30-40 — 236 markers, Cyclops territory, Howling Peak, cold weather', keywords: ['albaneve', 'summits', 'snow', 'frozen', 'cyclops', 'fell dragon youngling', 'howling peak', 'everfrore keep', 'polaris falls', 'cold'], route: { page: 'map', sub: 'biome-albaneve' } },
-  { id: 'map-veilwater', title: 'Veilwater Basin', category: 'Map & Locations', description: 'Tropical endgame Lv 35-45 — 267 markers, swimming & diving, Drak temples, fishing', keywords: ['veilwater', 'basin', 'endgame', 'drak', 'temple', 'fell critter queen', 'swimming', 'diving', 'tropical', 'wake of the water'], route: { page: 'map', sub: 'biome-veilwater' } },
-  { id: 'map-key-locations', title: 'Key Locations', category: 'Map & Locations', description: 'All 8 Ancient Spires, 6 Hollow Halls, 19 Elixir Wells, Ancient Vaults, Sun Temples', keywords: ['ancient spire', 'hollow halls', 'elixir well', 'ancient vault', 'sun temple', 'obelisk', 'gem forge', 'balefire', 'night sanctum', 'flame shrine'], route: { page: 'map', sub: 'key-locations' } },
-  { id: 'map-fast-travel', title: 'Fast Travel', category: 'Map & Locations', description: 'Flame Altar network, Glider, Grappling Hook, traversal skills and routes', keywords: ['fast travel', 'teleport', 'flame altar', 'glider', 'grappling hook', 'double jump', 'updraft', 'travel route'], route: { page: 'map', sub: 'fast-travel' } },
-  { id: 'map-collectibles', title: 'Collectibles', category: 'Map & Locations', description: 'Fossils, music sheets, Cyclops skeleton, Drak reliefs, flame mosaics, statue sets', keywords: ['collectible', 'fossil', 'music sheet', 'cyclops skeleton', 'drak relief', 'flame mosaic', 'queen pikemead statue', 'dragon map', 'lore page', 'blessing'], route: { page: 'map', sub: 'collectibles' } },
-  { id: 'map-exploration', title: 'Exploration Tips', category: 'Map & Locations', description: 'Shroud survival, dynamic weather, hidden areas, resource farming routes', keywords: ['exploration', 'shroud survival', 'weather', 'hidden area', 'cave', 'tomb', 'completionist', 'farming route'], route: { page: 'map', sub: 'exploration-tips' } },
-
-  // === QUESTS (150+ quests, 9 categories) ===
-  { id: 'quests', title: 'Quests & Missions', category: 'Section', description: 'All 150+ quests — main story, NPC rescues, quest chains, building blocks, bounties', keywords: ['quest', 'mission', 'story', 'walkthrough'], route: { page: 'quests' } },
-  { id: 'quests-main', title: 'Main Story Quests', category: 'Quests', description: 'Full Flameborn storyline — 23 quests from the Cinder Vault to the Veilwater Spire', keywords: ['main story', 'flameborn', 'story quest', 'veilwater spire', 'emerald shores', 'hollow halls quest', 'ancient spire quest'], route: { page: 'quests', sub: 'main-story' } },
-  { id: 'quests-rescue', title: 'NPC Rescue Quests', category: 'Quests', description: 'All 10 survivors — 5 core craftspeople plus Collector, Bard, Barber, Fisher, seasonal trader', keywords: ['npc rescue', 'survivor', 'blacksmith', 'alchemist', 'hunter', 'carpenter', 'farmer', 'collector', 'alden crowley', 'bard', 'valory', 'barber', 'fisher', 'vault'], route: { page: 'quests', sub: 'npc-rescue' } },
-  { id: 'quests-chains', title: 'NPC Quest Chains', category: 'Quests', description: 'Complete quest lines for every survivor — Hunter 9, Alchemist 12, Carpenter 9, Farmer 8, Collector 6, Bard 9', keywords: ['quest chain', 'hunter quests', 'alchemist quests', 'carpenter quests', 'farmer quests', 'collector quests', 'bard quests', 'needs shelter', 'sun temple stories'], route: { page: 'quests', sub: 'npc-quest-chains' } },
-  { id: 'quests-blocks', title: 'Building Block Quests', category: 'Quests', description: 'Hidden quests unlocking every block style — Bone, Half-Timbered, Citywall, Obsidian + 7 bonus blocks', keywords: ['building block', 'bone block', 'half-timbered', 'citywall', 'obsidian block', 'hidden quest', 'block reward', 'garden gnome'], route: { page: 'quests', sub: 'building-blocks' } },
-  { id: 'quests-bounty', title: 'Bounty Board Quests', category: 'Quests', description: 'Repeatable bounties for Runes and materials — tiers, types, and farming strategy', keywords: ['bounty', 'bounty board', 'runes', 'repeatable quest'], route: { page: 'quests', sub: 'bounty-board' } },
-
-  // === LORE & STORY (15 topics) ===
-  { id: 'lore', title: 'Lore & Story', category: 'Section', description: 'Complete history and mythology of Embervale — 15 lore topics, 40+ writings', keywords: ['lore', 'story', 'history', 'embervale', 'mythology'], route: { page: 'lore' } },
-  { id: 'lore-characters', title: 'Key Characters', category: 'Lore & Story', description: 'All 10 rescuable survivors plus historical figures — Queen Jezmina, the Mysterious Stranger', keywords: ['character', 'npc', 'survivor', 'oswald anders', 'balthazar', 'athalan skree', 'cade hawthorn', 'emily fray', 'alden crowley', 'valory', 'queen jezmina', 'blacksmith', 'bard'], route: { page: 'lore', sub: 'characters' } },
-  { id: 'lore-drak', title: 'The Drak & the Sunken Kingdom', category: 'Lore & Story', description: 'Wake of the Water lore — the reptilian Drak civilization, sunken temples, and the 7 Drak Reliefs', keywords: ['drak', 'drakdal', 'veilwater lore', 'sunken kingdom', 'drak relief', 'fell critter queen', 'wake of the water'], route: { page: 'lore', sub: 'the-drak' } },
-  { id: 'lore-frozen', title: 'Legends of the Frozen Frontier', category: 'Lore & Story', description: 'Albaneve lore — Cyclops, dragon skeletons, Balefire Strongholds, fallen garrisons', keywords: ['albaneve lore', 'cyclops', 'dragon skeleton', 'balefire stronghold', 'iron heart', 'everfrore keep', 'frozen frontier', 'fell dragon'], route: { page: 'lore', sub: 'frozen-frontier' } },
-  { id: 'lore-library', title: 'Lore Books & Writings', category: 'Lore & Story', description: 'Every journal series and letter cataloged — Alchemist\'s Theories, Captain\'s Journal, 40+ writings', keywords: ['lore book', 'journal', 'writing', 'letter', 'alchemist theories', 'captain journal', 'lore page', 'honeydews', 'bed time stories'], route: { page: 'lore', sub: 'lore-library' } },
-
-  // === WALKTHROUGH ===
-  { id: 'walkthrough', title: 'Complete Walkthrough', category: 'Section', description: 'Full game walkthrough — 12 chapters plus Flame Altar and Hollow Halls guides', keywords: ['walkthrough', 'guide', 'story mode', 'progression'], route: { page: 'walkthrough' } },
-  { id: 'walkthrough-flame', title: 'Flame Altar Guide', category: 'Walkthrough', description: 'Flame Level 1-9 upgrade table — all materials, boss heads, Shroud timers, farming shortcuts', keywords: ['flame altar', 'flame level', 'strengthen flame', 'shroud timer', 'boss head', 'spark', 'pearl', 'passionflower', 'green vitriol', 'hydrakdal head'], route: { page: 'walkthrough', sub: 'flame-altar-guide' } },
-  { id: 'walkthrough-hollow', title: 'Hollow Halls Guide', category: 'Walkthrough', description: 'All 6 Hollow Halls — bone keys, magick barriers, bone totems, loot tables, Collector loop', keywords: ['hollow halls', 'bone key', 'ectoplasm', 'dungeon guide', 'hollow cyclops', 'collector', 'magick barrier', 'bone totem'], route: { page: 'walkthrough', sub: 'hollow-halls-guide' } },
-
-  // === TIPS & TRICKS (new) ===
-  { id: 'tips-update8', title: 'Update 8: Forging the Path', category: 'Tips & Tricks', description: 'v0.9.1.0 guide — skill tree reset, rune gear upgrades, Focus ultimates, heavy attacks, adventure sharing', keywords: ['update 8', 'forging the path', 'skill reset', 'focus bar', 'ultimate', 'heavy attack', 'gear upgrade', 'runes', 'adventure sharing', 'quick stack', 'sprinkler', 'updraft'], route: { page: 'tips', sub: 'update8-forging' } },
-  { id: 'tips-hidden', title: 'Hidden Mechanics & Obscure Tricks', category: 'Tips & Tricks', description: 'Mechanics the game never explains — cheap respecs, chest persistence, free repairs, magic chests, bone totems', keywords: ['hidden mechanic', 'respec', 'chest respawn', 'free repair', 'magic chest', 'bone totem', 'slow walk', 'lock on', 'oxygen', 'salvage'], route: { page: 'tips', sub: 'hidden-mechanics' } },
-
-  // === PATCH NOTES (new) ===
-  { id: 'updates-timeline', title: 'Complete Version Timeline', category: 'Patch Notes', description: 'Every version at a glance — v0.1.0 launch to v0.9.1.2, all updates, patches, and 42 hotfixes in one table', keywords: ['version history', 'timeline', 'hotfix list', 'patch list', 'v0.9.1.2', 'current version', 'update 7', 'update 8', 'release date'], route: { page: 'updates', sub: 'version-timeline' } },
-
-  // === FISHING (new) ===
-  { id: 'fishing-quests', title: 'Fishing Quest Chain', category: 'Fishing', description: 'Full fishing quest walkthrough — Unknown Waters, A Cursed Catch, Lucky Catch, Nice Day For Fishing + all rod rewards', keywords: ['fishing quest', 'unknown waters', 'cursed catch', 'lucky catch', 'nice day for fishing', 'captain fontane', 'fisher npc', 'rod unlock'], route: { page: 'fishing', sub: 'quest-chain' } },
-  { id: 'fishing-loot', title: 'Loot Pools & Hidden Mechanics', category: 'Fishing', description: 'Hidden rod weights, per-biome trash pools, Wet Boot, night bait, fish salvage loop', keywords: ['wet boot', 'trash loot', 'hidden stats', 'fish bones', 'fish teeth', 'electric nerve', 'shockfin', 'thornridge', 'yellowfin', 'epic bait', 'salvage fish'], route: { page: 'fishing', sub: 'loot-pools' } },
-
-  // === BASE BUILDING (new) ===
-  { id: 'base-altar-rules', title: 'Flame Altar Rules & Limits', category: 'Base Building', description: 'The 30-minute rollback, 10-altar cap, altar leapfrogging, and server permission roles', keywords: ['flame altar', 'altar cap', 'rollback', 'sky base', 'leapfrog', 'visitor role', 'server permissions', 'fast travel'], route: { page: 'base', sub: 'altar-mechanics' } },
-  { id: 'base-production', title: 'Mills & Power Systems', category: 'Base Building', description: 'Water wheels, windmills, force generators — Mill quest, Iron Dust, Green Vitriol Dust production', keywords: ['mill', 'water wheel', 'windmill', 'force generator', 'iron dust', 'green vitriol', 'river reach', 'millstone', 'automation'], route: { page: 'base', sub: 'production-chains' } },
-
-  // === GAME MECHANICS (new) ===
-  { id: 'mechanics-weather', title: 'Weather & Environment', category: 'Game Mechanics', description: 'Dynamic weather — wetness debuff, rain stealth bonus, deep snow, slippery ice, body heat', keywords: ['weather', 'rain', 'snow', 'wetness', 'deep snow', 'ice', 'body heat', 'storm', 'fog', 'campfire warmth'], route: { page: 'mechanics', sub: 'weather-system' } },
-
-  // === TROUBLESHOOTING (new) ===
-  { id: 'trouble-update8', title: 'Update 8 Migration Issues', category: 'Troubleshooting', description: 'Post-patch problems — skill reset, weaker armor, lost equipment, keybinds, flooded bases, shader stutter', keywords: ['update 8 bug', 'skill points gone', 'armor weaker', 'lost equipment', 'base flooding', 'shader stutter', 'keybinds changed'], route: { page: 'troubleshoot', sub: 'update8-migration' } },
-  { id: 'trouble-quests', title: 'Stuck Quests & Character Fixes', category: 'Troubleshooting', description: 'Treacherous Waters fix, Mill floodgate workaround, stuck in geometry, blocked doors', keywords: ['stuck quest', 'treacherous waters', 'mill floodgate', 'stuck in wall', 'stuck falling', 'door blocked', 'flame temple stuck'], route: { page: 'troubleshoot', sub: 'quest-progression-fixes' } },
+const groups: [string, SubEntry[]][] = [
+  ['beginner', beginnerSubSections],
+  ['skills', skillsSubSections],
+  ['builds', buildSubSections],
+  ['armor', armorSubSections],
+  ['items', itemsSubSections],
+  ['crafting', craftingSubSections],
+  ['bosses', bossesSubSections],
+  ['enemies', enemiesSubSections],
+  ['map', mapSubSections],
+  ['quests', questsSubSections],
+  ['lore', loreSubSections],
+  ['walkthrough', walkthroughSubSections],
+  ['tips', tipsSubSections],
+  ['updates', updatesSubSections],
+  ['fishing', fishingSubSections],
+  ['base', baseSubSections],
+  ['mechanics', mechanicsSubSections],
+  ['troubleshoot', troubleshootSubSections],
 ];
+
+// Extra per-section vocabulary so gamer terms hit the right section
+const SECTION_KEYWORDS: Record<string, string[]> = {
+  troubleshoot: ['fix', 'error', 'crash', 'bug', 'problem', 'not working', 'help'],
+  tips: ['tip', 'trick', 'secret', 'guide', 'how to'],
+  bosses: ['boss', 'fight', 'how to beat', 'strategy', 'loot'],
+  weaponsdb: ['weapon', 'damage', 'stats', 'legendary'],
+  updates: ['patch', 'update', 'version', 'changelog', 'hotfix'],
+  beginner: ['beginner', 'new player', 'start', 'first', 'early game'],
+  builds: ['build', 'class', 'best build', 'meta'],
+  skills: ['skill', 'skill tree', 'talent', 'respec'],
+  fishing: ['fish', 'fishing', 'rod', 'bait'],
+  base: ['base', 'building', 'build base', 'flame altar'],
+  mechanics: ['mechanic', 'system', 'how does', 'shroud'],
+  map: ['map', 'location', 'where', 'biome', 'region'],
+  quests: ['quest', 'mission', 'story'],
+  lore: ['lore', 'story', 'history'],
+  items: ['item', 'material', 'ore', 'where to find'],
+  crafting: ['craft', 'crafting', 'recipe', 'station'],
+  enemies: ['enemy', 'creature', 'monster', 'mob'],
+  armor: ['armor', 'armour', 'set', 'gear', 'defense'],
+  walkthrough: ['walkthrough', 'chapter', 'progression', 'guide'],
+};
+
+function words(title: string): string[] {
+  return title
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter((w) => w.length > 2);
+}
+
+function unique(list: string[]): string[] {
+  return [...new Set(list)];
+}
+
+const slugify = (s: string) =>
+  s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+const humanize = (slug: string) =>
+  slug.split('-').map((w) => (w ? w[0].toUpperCase() + w.slice(1) : '')).join(' ');
+
+/* ---------- Section entries (the 20 home cards + info pages) ---------- */
+const sectionEntries: SearchItem[] = [
+  ...Object.entries(SECTION_NAMES).map(([page, name]) => ({
+    id: `section-${page}`,
+    title: name,
+    category: 'Section',
+    description: `${name} — complete Enshrouded guide section`,
+    keywords: unique([name.toLowerCase(), page, ...(SECTION_KEYWORDS[page] ?? [])]),
+    route: { page },
+  })),
+  {
+    id: 'section-weaponsdb',
+    title: 'Weapons Database',
+    category: 'Section',
+    description: 'All 345 weapons with stats, scaling, perks, and locations',
+    keywords: ['weapon database', 'all weapons', 'weapon list', 'legendary weapons', ...(SECTION_KEYWORDS.weaponsdb ?? [])],
+    route: { page: 'weaponsdb' },
+  },
+  {
+    id: 'section-armor-pieces',
+    title: 'Armor Pieces Database',
+    category: 'Section',
+    description: 'Every individual armor piece — helmets, chests, gloves, legs, boots, shields',
+    keywords: ['armor pieces', 'helmet', 'chest', 'gloves', 'boots', 'shield', 'armor database'],
+    route: { page: 'armor-pieces' },
+  },
+];
+
+/* ---------- Subsection entries (every guide page) ---------- */
+const subEntries: SearchItem[] = groups.flatMap(([page, subs]) =>
+  subs.map((s) => ({
+    id: `${page}-${s.id}`,
+    title: s.title,
+    category: SECTION_NAMES[page] ?? page,
+    description: s.summary ?? s.description ?? `${s.title} — Enshrouded guide`,
+    keywords: unique([...words(s.title), ...(SECTION_KEYWORDS[page] ?? [])]),
+    route: { page, sub: s.id },
+  }))
+);
+
+/* ---------- Weapon entries (all 345) ---------- */
+interface WeaponRow {
+  name: string;
+  category: string;
+  level: number;
+  rarity: string;
+  location?: string;
+  description?: string;
+}
+
+const weaponEntries: SearchItem[] = (weaponsData as WeaponRow[]).map((w) => ({
+  id: `weapon-${slugify(w.name)}`,
+  title: w.name,
+  category: 'Weapons',
+  description: `${w.rarity} ${w.category} · Lv ${w.level}${w.location ? ` · ${w.location}` : ''}`,
+  keywords: unique([
+    ...words(w.name),
+    w.category.toLowerCase(),
+    w.rarity.toLowerCase(),
+    'weapon',
+    ...(w.location ? words(w.location) : []),
+  ]),
+  route: { page: 'weaponsdb' },
+  href: `/weaponsdb?q=${encodeURIComponent(w.name)}`,
+}));
+
+/* ---------- Armor set entries (all tiers) ---------- */
+interface ArmorSetRow { id: string; name: string; tier: string }
+
+const armorSetEntries: SearchItem[] = [
+  ...sTierArmor, ...aTierArmor, ...bTierArmor, ...cTierArmor,
+].map((a: ArmorSetRow) => ({
+  id: `armorset-${a.id}`,
+  title: a.name,
+  category: 'Armor Sets',
+  description: `${a.tier}-Tier armor set — pieces, bonuses, and where to find it`,
+  keywords: unique([...words(a.name), 'armor', 'set', a.tier.toLowerCase() + '-tier', 'gear']),
+  route: { page: 'armor', sub: a.id },
+}));
+
+/* ---------- Boss entries (all 13 detail pages) ---------- */
+const bossEntries: SearchItem[] = Object.keys(bossDetails).map((key) => {
+  const name = (bossDetails as Record<string, { name?: string }>)[key]?.name ?? humanize(key);
+  return {
+    id: `boss-${key}`,
+    title: name,
+    category: 'Bosses',
+    description: `${name} boss guide — location, mechanics, weaknesses, strategy, and loot`,
+    keywords: unique([...words(name), 'boss', 'how to beat', 'fight', 'strategy', 'loot']),
+    route: { page: 'bosses', sub: key },
+  };
+});
+
+export const searchIndex: SearchItem[] = [
+  ...sectionEntries,
+  ...subEntries,
+  ...weaponEntries,
+  ...armorSetEntries,
+  ...bossEntries,
+];
+
+/* ---------- Shared Fuse instance + helper ---------- */
+const fuse = new Fuse(searchIndex, {
+  keys: [
+    { name: 'title', weight: 0.45 },
+    { name: 'keywords', weight: 0.25 },
+    { name: 'description', weight: 0.2 },
+    { name: 'category', weight: 0.1 },
+  ],
+  threshold: 0.32,
+  includeScore: true,
+  minMatchCharLength: 2,
+});
+
+export function siteSearch(query: string, limit = 12): FuseResult<SearchItem>[] {
+  const q = query.trim();
+  if (q.length < 2) return [];
+  return fuse.search(q).slice(0, limit);
+}
