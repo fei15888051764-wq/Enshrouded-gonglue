@@ -5,8 +5,11 @@ import {
   Ghost, Bird, Diamond, AlertTriangle, MapPin
 } from 'lucide-react';
 import PageLayout from './PageLayout';
+import SubsectionCards from '../components/SubsectionCards';
 import { allEnemies, enemyCategories, FACTION_COLORS } from '../data/enemiesDataUnified';
 import type { EnemyEntry } from '../data/enemiesDataUnified';
+import { enemiesSubSections } from '../data/enemiesData';
+import { enemiesImages } from '../data/bossesEnemiesImages';
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   'Fell': <Bug className="w-4 h-4" />,
@@ -172,6 +175,14 @@ export default function EnemiesHomePage() {
           <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mt-1">Passive</div>
         </div>
       </div>
+
+      {/* Faction guide pages */}
+      <SubsectionCards
+        page="enemies"
+        sections={enemiesSubSections}
+        images={enemiesImages}
+        heading="Faction Guides"
+      />
 
       {/* Search */}
       <div className="mb-6">
