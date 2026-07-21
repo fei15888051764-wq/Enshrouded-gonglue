@@ -1,6 +1,9 @@
 import { usePage } from '../App';
 import { Search, Menu, X, Twitter, Mail, ChevronRight, Flame, ExternalLink } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { type FuseResult } from 'fuse.js';
+import { siteSearch, type SearchItem } from '../data/searchIndex';
 import LatestUpdates from './LatestUpdates';
 
 const sections = [
@@ -28,13 +31,29 @@ const sections = [
 
 export default function HomePage() {
   const { navigate } = usePage();
+  const routerNavigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<FuseResult<SearchItem>[]>([]);
 
-  const filteredSections = sections.filter(s => 
-    s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    s.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const handleSearch = (value: string) => {
+    setSearchQuery(value);
+    setSearchResults(siteSearch(value, 8));
+  };
+
+  const handleSelectResult = (item: SearchItem) => {
+    setSearchQuery('');
+    setSearchResults([]);
+    if (item.href) {
+      routerNavigate(item.href);
+      return;
+    }
+    if (item.route.sub) {
+      navigate(item.route.page as any, item.route.sub);
+    } else {
+      navigate(item.route.page as any);
+    }
+  };
 
   return (
     <div className="game-bg min-h-screen">
@@ -111,11 +130,44 @@ export default function HomePage() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--border-gold)]" />
             <input
               type="text"
-              placeholder="Search guides, items, bosses..."
+              placeholder="Search guides, weapons, armor, bosses..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => handleSearch(e.target.value)}
+              onBlur={() => setTimeout(() => setSearchResults([]), 200)}
               className="w-full pl-11 pr-4 py-3 bg-[var(--panel-inner)] border border-[var(--border-gold-dim)] rounded-sm text-[var(--text-primary)] placeholder-[var(--text-secondary)]/50 focus:outline-none focus:border-[var(--border-gold)] text-sm transition-colors"
             />
+
+            {/* Live results dropdown */}
+            {searchQuery.trim().length >= 2 && (
+              <div className="absolute left-0 right-0 top-full mt-2 z-50 bg-[#0a0e17] border border-[var(--border-gold)]/30 rounded-lg shadow-2xl shadow-black/50 overflow-hidden text-left">
+                {searchResults.length === 0 ? (
+                  <div className="px-4 py-3 text-xs text-[var(--text-muted)]">
+                    No results for &quot;{searchQuery.trim()}&quot; — try different keywords
+                  </div>
+                ) : (
+                  searchResults.map(({ item }) => (
+                    <button
+                      key={item.id}
+                      onClick={() => handleSelectResult(item)}
+                      className="w-full flex items-start gap-3 px-4 py-2.5 hover:bg-[var(--border-gold)]/10 transition-colors group"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold text-[var(--text-primary)] group-hover:text-[var(--text-gold)] transition-colors">
+                            {item.title}
+                          </span>
+                          <span className="text-[9px] px-1 py-0.5 rounded bg-[var(--border-gold)]/10 text-[var(--text-gold)]/80 flex-shrink-0">
+                            {item.category}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-[var(--text-muted)] truncate mt-0.5">{item.description}</p>
+                      </div>
+                      <ChevronRight className="w-3.5 h-3.5 text-[var(--border-gold-dim)] group-hover:text-[var(--text-gold)] flex-shrink-0 mt-1" />
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -138,11 +190,11 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
             <h2 className="section-title text-xl md:text-2xl">Choose Your Path</h2>
-            <p className="text-[var(--text-secondary)] text-sm mt-4">{filteredSections.length} guide categories</p>
+            <p className="text-[var(--text-secondary)] text-sm mt-4">{sections.length} guide categories</p>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-            {filteredSections.map((section, index) => (
+            {sections.map((section, index) => (
               <div
                 key={section.id}
                 onClick={() => navigate(section.id)}
@@ -175,12 +227,6 @@ export default function HomePage() {
             ))}
           </div>
 
-          {filteredSections.length === 0 && (
-            <div className="text-center py-16 text-[var(--text-secondary)]">
-              <Search className="w-10 h-10 mx-auto mb-3 opacity-30" />
-              <p>No guides found matching your search.</p>
-            </div>
-          )}
         </div>
       </section>
 
