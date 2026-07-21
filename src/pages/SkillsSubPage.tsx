@@ -4,6 +4,7 @@ import { Swords, ChevronRight, Home, ArrowUp } from 'lucide-react';
 import PageLayout from './PageLayout';
 import { skillsSubSections } from '../data/skillsData';
 import SectionGallery from '../components/SectionGallery';
+import SubPageHero from '../components/SubPageHero';
 import { skillsImages } from '../data/skillsBuildsImages';
 
 interface SkillsSubPageProps {
@@ -73,8 +74,9 @@ export default function SkillsSubPage({ subId }: SkillsSubPageProps) {
           <ChevronRight className="w-3 h-3" />
           <span className="text-[var(--text-gold)]">{section.title}</span>
         </div>
+        <SubPageHero images={skillsImages[section.id]} />
         <div className="max-w-4xl">{section.content}</div>
-        <SectionGallery images={skillsImages[section.id]} />
+        <SectionGallery images={skillsImages[section.id]} skipFirst />
         <div className="mt-10 pt-6 border-t border-[var(--border-gold)]/20">
           <div className="flex items-center justify-between">
             {prev ? (
