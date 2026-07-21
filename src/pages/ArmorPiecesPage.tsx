@@ -6,6 +6,7 @@ import {
   PersonStanding, Footprints, Star, MapPin
 } from 'lucide-react';
 import PageLayout from './PageLayout';
+import SubPageHero from '../components/SubPageHero';
 import { allArmorPieces } from '../data/armorPiecesData';
 import type { ArmorPieceEntry } from '../data/armorPiecesData';
 
@@ -179,6 +180,8 @@ export default function ArmorPiecesPage() {
         <ChevronRight className="w-3 h-3" />
         <span className="text-[var(--text-gold)]">Armor Pieces</span>
       </div>
+
+      <SubPageHero images={[{ src: '/images/beginner/character-customize.webp', caption: 'Every armor piece in the game — mix and match to forge your perfect build.' }]} />
 
       {/* Overview */}
       <div className="game-panel corner-decor p-6 mb-8">
