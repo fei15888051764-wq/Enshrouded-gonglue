@@ -3,6 +3,7 @@ import { usePage } from '../App';
 import { Settings, ChevronRight, Home, ArrowUp } from 'lucide-react';
 import PageLayout from './PageLayout';
 import SectionGallery from '../components/SectionGallery';
+import SubPageHero from '../components/SubPageHero';
 import { mechanicsImages } from '../data/mechanicsFishingImages';
 import { mechanicsSubSections } from '../data/mechanicsData';
 
@@ -73,8 +74,9 @@ export default function MechanicsSubPage({ subId }: MechanicsSubPageProps) {
           <ChevronRight className="w-3 h-3" />
           <span className="text-[var(--text-gold)]">{section.title}</span>
         </div>
+        <SubPageHero images={mechanicsImages[section.id]} />
         <div className="max-w-4xl">{section.content}</div>
-        <SectionGallery images={mechanicsImages[section.id]} />
+        <SectionGallery images={mechanicsImages[section.id]} skipFirst />
         <div className="mt-10 pt-6 border-t border-[var(--border-gold)]/20">
           <div className="flex items-center justify-between">
             {prev ? (
