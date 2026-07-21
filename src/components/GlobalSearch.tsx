@@ -1,22 +1,9 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, X, Loader2, Wrench, Star, Clock, AlertTriangle, Swords, Compass, Home, Fish, Flame, TrendingUp, Users, Eye, ChefHat, Beaker, Sprout, Waves, Gauge, Shield, Bug, Server, Volume2, Gamepad2, Gpu, Save, Wifi, Monitor, MapPin, Rocket, Music, CloudSun, Hammer, Skull, Gem, Zap } from 'lucide-react';
-import Fuse, { type FuseResult } from 'fuse.js';
+import { type FuseResult } from 'fuse.js';
 import { usePage } from '../App';
-import { searchIndex } from '../data/searchIndex';
-
-const fuseOptions = {
-  keys: [
-    { name: 'title', weight: 0.4 },
-    { name: 'description', weight: 0.3 },
-    { name: 'keywords', weight: 0.2 },
-    { name: 'category', weight: 0.1 },
-  ],
-  threshold: 0.35,
-  includeScore: true,
-  minMatchCharLength: 2,
-};
-
-const fuse = new Fuse(searchIndex, fuseOptions);
+import { siteSearch, type SearchItem } from '../data/searchIndex';
 
 const categoryIcons: Record<string, React.ReactNode> = {
   'Tips & Tricks': <Star className="w-4 h-4" />,
@@ -68,30 +55,30 @@ const subIcons: Record<string, React.ReactNode> = {
 
 export default function GlobalSearch() {
   const { navigate } = usePage();
+  const routerNavigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<FuseResult<typeof searchIndex[0]>[]>([]);
+  const [results, setResults] = useState<FuseResult<SearchItem>[]>([]);
 
   const handleSearch = useCallback((value: string) => {
     setQuery(value);
-    if (value.trim().length < 2) {
-      setResults([]);
-      return;
-    }
-    const searchResults = fuse.search(value.trim());
-    setResults(searchResults.slice(0, 12));
+    setResults(siteSearch(value, 12));
   }, []);
 
-  const handleSelect = useCallback((item: typeof searchIndex[0]) => {
+  const handleSelect = useCallback((item: SearchItem) => {
     setOpen(false);
     setQuery('');
     setResults([]);
+    if (item.href) {
+      routerNavigate(item.href);
+      return;
+    }
     if (item.route.sub) {
       navigate(item.route.page as any, item.route.sub);
     } else {
       navigate(item.route.page as any);
     }
-  }, [navigate]);
+  }, [navigate, routerNavigate]);
 
   // Keyboard shortcut: Cmd/Ctrl + K to open
   useEffect(() => {
@@ -117,7 +104,7 @@ export default function GlobalSearch() {
   }, [open]);
 
   const groupedResults = useMemo(() => {
-    const groups: Record<string, FuseResult<typeof searchIndex[0]>[]> = {};
+    const groups: Record<string, FuseResult<SearchItem>[]> = {};
     results.forEach(r => {
       const cat = r.item.category;
       if (!groups[cat]) groups[cat] = [];
