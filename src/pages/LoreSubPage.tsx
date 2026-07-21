@@ -3,6 +3,7 @@ import { usePage } from '../App';
 import { BookOpen, ChevronRight, Home, ArrowUp } from 'lucide-react';
 import PageLayout from './PageLayout';
 import SectionGallery from '../components/SectionGallery';
+import SubPageHero from '../components/SubPageHero';
 import { loreImages } from '../data/questsLoreImages';
 import { loreSubSections } from '../data/loreData';
 
@@ -92,10 +93,11 @@ export default function LoreSubPage({ subId }: LoreSubPageProps) {
         </div>
 
         {/* Content */}
+        <SubPageHero images={loreImages[section.id]} />
         <div className="max-w-4xl">
           {section.content}
         </div>
-        <SectionGallery images={loreImages[section.id]} />
+        <SectionGallery images={loreImages[section.id]} skipFirst />
 
         {/* Navigation Footer - Previous/Next */}
         <div className="mt-10 pt-6 border-t border-[var(--border-gold)]/20">

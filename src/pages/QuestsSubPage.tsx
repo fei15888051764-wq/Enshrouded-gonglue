@@ -3,6 +3,7 @@ import { usePage } from '../App';
 import { ScrollText, ChevronRight, Home, ArrowUp } from 'lucide-react';
 import PageLayout from './PageLayout';
 import SectionGallery from '../components/SectionGallery';
+import SubPageHero from '../components/SubPageHero';
 import { questsImages } from '../data/questsLoreImages';
 import { questsSubSections } from '../data/questsData';
 
@@ -88,10 +89,11 @@ export default function QuestsSubPage({ subId }: QuestsSubPageProps) {
         </div>
 
         {/* Content */}
+        <SubPageHero images={questsImages[section.id]} />
         <div className="max-w-4xl">
           {section.content}
         </div>
-        <SectionGallery images={questsImages[section.id]} />
+        <SectionGallery images={questsImages[section.id]} skipFirst />
 
         {/* Navigation Footer */}
         <div className="mt-10 pt-6 border-t border-[var(--border-gold)]/20">
