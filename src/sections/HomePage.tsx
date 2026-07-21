@@ -27,6 +27,7 @@ const sections = [
   { id: 'base', title: 'Base Building', description: 'Base construction and survivor management', icon: '/images/game-icons/base.webp' },
   { id: 'mechanics', title: 'Game Mechanics', description: 'Combat, gliding, Shroud, and systems', icon: '/images/game-icons/mechanics.webp' },
   { id: 'troubleshoot', title: 'Troubleshooting', description: 'Fix crashes, lag, and technical issues', icon: '/images/game-icons/tech.webp' },
+  { id: 'screenshots', title: 'Game Screenshots', description: 'Real in-game captures — combat, biomes, bases, bosses, and the Shroud', icon: '/images/game-icons/screenshots.webp' },
 ];
 
 export default function HomePage() {

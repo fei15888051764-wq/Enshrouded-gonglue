@@ -16,6 +16,7 @@ import { loreSubSections } from './loreData';
 import { mapSubSections } from './mapData';
 import { mechanicsSubSections } from './mechanicsData';
 import { questsSubSections } from './questsData';
+import { screenshotsSubSections } from './screenshotsData';
 import { skillsSubSections } from './skillsData';
 import { tipsSubSections } from './tipsData';
 import { troubleshootSubSections } from './troubleshootData';
@@ -84,6 +85,7 @@ const sectionMeta: Record<string, SeoMeta> = {
   troubleshoot: { title: `Troubleshooting & Fixes | ${SITE}`, description: 'Fix crashes, performance issues, multiplayer problems, stuck quests, and Update 8 migration issues.' },
   builds: { title: `Character Builds | ${SITE}`, description: 'Meta builds for every class — warrior, ranger, and mage with skills, gear, and playstyle guides.' },
   armor: { title: `Armor Sets Guide | ${SITE}`, description: 'Every armor set in Enshrouded — set bonuses, stats, and where to find them.' },
+  screenshots: { title: `Game Screenshots Gallery | ${SITE}`, description: 'Real in-game Enshrouded screenshots — combat, biomes, base building, bosses, the Shroud, gliding, gear systems, co-op, and official key art.' },
 };
 
 // Auto-generate sub-page entries from section data
@@ -101,6 +103,7 @@ const groups: [string, { id: string; title: string; summary?: string; descriptio
   ['map', mapSubSections],
   ['mechanics', mechanicsSubSections],
   ['quests', questsSubSections],
+  ['screenshots', screenshotsSubSections],
   ['skills', skillsSubSections],
   ['tips', tipsSubSections],
   ['troubleshoot', troubleshootSubSections],
