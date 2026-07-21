@@ -3,6 +3,7 @@ import { usePage } from '../App';
 import { Map, ChevronRight, Home, ArrowUp } from 'lucide-react';
 import PageLayout from './PageLayout';
 import SectionGallery from '../components/SectionGallery';
+import SubPageHero from '../components/SubPageHero';
 import { walkthroughImages } from '../data/mapWalkthroughImages';
 import { walkthroughSubSections } from '../data/walkthroughData';
 
@@ -73,8 +74,9 @@ export default function WalkthroughSubPage({ subId }: WalkthroughSubPageProps) {
           <ChevronRight className="w-3 h-3" />
           <span className="text-[var(--text-gold)]">{section.title}</span>
         </div>
+        <SubPageHero images={walkthroughImages[section.id]} />
         <div className="max-w-4xl">{section.content}</div>
-        <SectionGallery images={walkthroughImages[section.id]} />
+        <SectionGallery images={walkthroughImages[section.id]} skipFirst />
         <div className="mt-10 pt-6 border-t border-[var(--border-gold)]/20">
           <div className="flex items-center justify-between">
             {prev ? (

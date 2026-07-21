@@ -4,6 +4,7 @@ import { Wrench, ChevronRight, Home, ArrowUp } from 'lucide-react';
 import PageLayout from './PageLayout';
 import { troubleshootSubSections } from '../data/troubleshootData';
 import SectionGallery from '../components/SectionGallery';
+import SubPageHero from '../components/SubPageHero';
 import { troubleshootImages } from '../data/tipsUpdatesTroubleArmorImages';
 
 interface TroubleshootSubPageProps {
@@ -73,8 +74,9 @@ export default function TroubleshootSubPage({ subId }: TroubleshootSubPageProps)
           <ChevronRight className="w-3 h-3" />
           <span className="text-[var(--text-gold)]">{section.title}</span>
         </div>
+        <SubPageHero images={troubleshootImages[section.id]} />
         <div className="max-w-4xl">{section.content}</div>
-        <SectionGallery images={troubleshootImages[section.id]} />
+        <SectionGallery images={troubleshootImages[section.id]} skipFirst />
         <div className="mt-10 pt-6 border-t border-[var(--border-gold)]/20">
           <div className="flex items-center justify-between">
             {prev ? (
