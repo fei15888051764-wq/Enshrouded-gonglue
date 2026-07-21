@@ -68,7 +68,114 @@ export default function ArmorSubPage({ subId }: ArmorSubPageProps) {
 
   const handleNav = (id: string) => { navigate('armor', id); };
   const armor = allArmor.find((a) => a.id === subId);
+  const tierSection = armor ? undefined : armorSubSections.find((s) => s.id === subId);
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Tier list page: /armor/s-tier-armor etc. — shows every set in the tier
+  if (tierSection) {
+    const tierLetter = tierSection.id.charAt(0).toUpperCase();
+    const tierImgs = armorTierImages[tierLetter];
+    const sidx = armorSubSections.findIndex((s) => s.id === subId);
+    const prevS = sidx > 0 ? armorSubSections[sidx - 1] : null;
+    const nextS = sidx < armorSubSections.length - 1 ? armorSubSections[sidx + 1] : null;
+    return (
+      <PageLayout title={tierSection.title} subtitle="Armor Sets" icon={<Shield className="w-6 h-6 text-[var(--text-gold)]" />}>
+        <nav className="sticky top-[57px] z-40 bg-[var(--bg-primary)]/95 backdrop-blur border-b border-[var(--border-gold)]/20 py-2">
+          <div className="max-w-6xl mx-auto px-3 flex flex-wrap gap-1.5">
+            {armorSubSections.map((s) => (
+              <button
+                key={s.id}
+                onClick={() => handleNav(s.id)}
+                className={`flex items-center gap-1 px-2 py-1 rounded text-[10px] font-cinzel font-bold uppercase tracking-wider transition-all
+                  ${subId === s.id
+                    ? 'bg-[var(--text-gold)]/20 text-[var(--text-gold)] border border-[var(--text-gold)]/30'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--border-gold)]/10 border border-transparent'
+                  }`}
+              >
+                <span>{s.title}</span>
+              </button>
+            ))}
+          </div>
+        </nav>
+        <div className="max-w-5xl mx-auto px-4 py-6">
+          <div className="flex items-center gap-2 mb-6 text-xs text-[var(--text-muted)] flex-wrap">
+            <button onClick={() => navigate('home')} className="flex items-center gap-1 hover:text-[var(--text-gold)] transition-colors">
+              <Home className="w-3 h-3" /><span>Home</span>
+            </button>
+            <ChevronRight className="w-3 h-3" />
+            <button onClick={() => navigate('armor')} className="hover:text-[var(--text-gold)] transition-colors">Armor</button>
+            <ChevronRight className="w-3 h-3" />
+            <span className="text-[var(--text-gold)]">{tierSection.title}</span>
+          </div>
+
+          <SubPageHero images={tierImgs} />
+          <div className="game-panel corner-decor p-6 mb-6 max-w-4xl">
+            <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{tierSection.description}</p>
+            <p className="text-[10px] text-[var(--text-muted)] mt-3">{tierSection.armor.length} armor {tierSection.armor.length === 1 ? 'set' : 'sets'} in this tier — click any set for full stats, set pieces, and how to obtain it.</p>
+          </div>
+
+          <div className={`grid gap-3 max-w-4xl ${tierSection.armor.length > 1 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
+            {tierSection.armor.map((a) => (
+              <button
+                key={a.id}
+                onClick={() => handleNav(a.id)}
+                className="game-panel corner-decor p-4 text-left hover:border-[var(--border-gold-light)] transition-all group cursor-pointer"
+              >
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-10 h-10 rounded-lg bg-[var(--border-gold)]/10 flex items-center justify-center text-[var(--text-gold)] flex-shrink-0">
+                    {a.icon}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-cinzel text-xs font-bold text-[var(--text-primary)] group-hover:text-[var(--text-gold)] transition-colors truncate">{a.name}</h3>
+                    <span className={`text-[10px] font-bold ${TIER_COLORS[a.tier]}`}>{a.tier}-Tier · Lv.{a.level}</span>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--text-gold)] transition-colors flex-shrink-0" />
+                </div>
+                <div className="flex items-center gap-3 text-[10px] text-[var(--text-muted)]">
+                  <span className="flex items-center gap-1"><Shield className="w-3 h-3" />{a.defense} / {a.mdefense}</span>
+                  <span className={`px-1.5 py-0.5 rounded border ${TYPE_COLORS[a.type]}`}>{a.type}</span>
+                  <span className="truncate">{a.playstyle}</span>
+                </div>
+              </button>
+            ))}
+          </div>
+
+          <SectionGallery images={tierImgs} skipFirst />
+
+          <div className="mt-10 pt-6 border-t border-[var(--border-gold)]/20 max-w-4xl">
+            <div className="flex items-center justify-between">
+              {prevS ? (
+                <button onClick={() => handleNav(prevS.id)} className="game-panel corner-decor p-3 text-left hover:border-[var(--border-gold-light)] transition-all group">
+                  <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-1">Previous Tier</div>
+                  <div className="flex items-center gap-2">
+                    <ChevronRight className="w-3 h-3 rotate-180 text-[var(--text-gold)]" />
+                    <span className="font-cinzel text-xs font-bold text-[var(--text-primary)] group-hover:text-[var(--text-gold)]">{prevS.title}</span>
+                  </div>
+                </button>
+              ) : <div />}
+              {nextS ? (
+                <button onClick={() => handleNav(nextS.id)} className="game-panel corner-decor p-3 text-right hover:border-[var(--border-gold-light)] transition-all group">
+                  <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mb-1">Next Tier</div>
+                  <div className="flex items-center gap-2 justify-end">
+                    <span className="font-cinzel text-xs font-bold text-[var(--text-primary)] group-hover:text-[var(--text-gold)]">{nextS.title}</span>
+                    <ChevronRight className="w-3 h-3 text-[var(--text-gold)]" />
+                  </div>
+                </button>
+              ) : <div />}
+            </div>
+          </div>
+        </div>
+
+        <button
+          onClick={scrollToTop}
+          className={`fixed bottom-6 right-6 z-50 w-10 h-10 rounded-full bg-[var(--bg-panel)] border border-[var(--border-gold)]/30 flex items-center justify-center text-[var(--text-gold)] shadow-lg transition-all duration-300 hover:bg-[var(--border-gold)]/20 ${showTopBtn ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}
+          aria-label="Back to top"
+        >
+          <ArrowUp className="w-5 h-5" />
+        </button>
+      </PageLayout>
+    );
+  }
 
   if (!armor) {
     return (
