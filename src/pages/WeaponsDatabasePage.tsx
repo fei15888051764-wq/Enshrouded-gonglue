@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { usePage } from '../App';
 import {
   ChevronRight, Home, Sword, Star, Crosshair, Zap,
@@ -192,8 +193,10 @@ function WeaponCard({ weapon }: { weapon: WeaponEntry }) {
 
 export default function WeaponsDatabasePage() {
   const { navigate } = usePage();
+  const [searchParams] = useSearchParams();
   const [activeCategory, setActiveCategory] = useState<string>('All');
-  const [searchQuery, setSearchQuery] = useState('');
+  // Deep-link support: /weaponsdb?q=<name> prefills the filter (used by global search)
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get('q') ?? '');
 
   const stats = useMemo(() => {
     const legendary = allWeapons.filter(w => w.isLegendary).length;
