@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useState, useMemo, useEffect } from 'react';
+import { useSearchParams, useParams, useNavigate } from 'react-router-dom';
 import { usePage } from '../App';
 import {
   ChevronRight, Home, Sword, Star, Crosshair, Zap,
@@ -191,12 +191,28 @@ function WeaponCard({ weapon }: { weapon: WeaponEntry }) {
   );
 }
 
+const slugifyCat = (c: string) => c.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+const catFromSlug = (slug?: string) =>
+  slug ? weaponCategories.find(c => slugifyCat(c) === slug) : undefined;
+
 export default function WeaponsDatabasePage() {
   const { navigate } = usePage();
   const [searchParams] = useSearchParams();
-  const [activeCategory, setActiveCategory] = useState<string>('All');
+  const { sub } = useParams();
+  const routerNavigate = useNavigate();
+  const [activeCategory, setActiveCategory] = useState<string>(() => catFromSlug(sub) ?? 'All');
   // Deep-link support: /weaponsdb?q=<name> prefills the filter (used by global search)
   const [searchQuery, setSearchQuery] = useState(() => searchParams.get('q') ?? '');
+
+  // Category pages: /weaponsdb/daggers etc. — URL drives the active tab
+  useEffect(() => {
+    setActiveCategory(catFromSlug(sub) ?? 'All');
+  }, [sub]);
+
+  const selectCategory = (cat: string) => {
+    setSearchQuery('');
+    routerNavigate(cat === 'All' ? '/weaponsdb' : `/weaponsdb/${slugifyCat(cat)}`);
+  };
 
   const stats = useMemo(() => {
     const legendary = allWeapons.filter(w => w.isLegendary).length;
@@ -306,10 +322,22 @@ export default function WeaponsDatabasePage() {
         />
       </div>
 
+      {/* Category page heading (only on category sub-pages) */}
+      {activeCategory !== 'All' && (
+        <div className="game-panel corner-decor p-5 mb-5">
+          <h2 className="font-cinzel text-lg font-bold text-[var(--text-gold)] mb-1">
+            {activeCategory} in Enshrouded
+          </h2>
+          <p className="text-xs text-[var(--text-secondary)]">
+            All {categoryCounts[activeCategory]} {activeCategory.toLowerCase()} with full stats, attribute scaling, attack speed, and exact drop locations.
+          </p>
+        </div>
+      )}
+
       {/* Category Tabs */}
       <div className="flex flex-wrap gap-2 mb-6">
         <button
-          onClick={() => setActiveCategory('All')}
+          onClick={() => selectCategory('All')}
           className={`px-3 py-1.5 rounded-sm text-[10px] font-cinzel font-bold uppercase tracking-wider transition-colors border ${
             activeCategory === 'All'
               ? 'bg-[var(--text-gold)]/20 text-[var(--text-gold)] border-[var(--text-gold)]/30'
@@ -321,7 +349,7 @@ export default function WeaponsDatabasePage() {
         {weaponCategories.map(cat => (
           <button
             key={cat}
-            onClick={() => setActiveCategory(cat)}
+            onClick={() => selectCategory(cat)}
             className={`px-3 py-1.5 rounded-sm text-[10px] font-cinzel font-bold uppercase tracking-wider transition-colors border flex items-center gap-1 ${
               activeCategory === cat
                 ? 'bg-[var(--text-gold)]/20 text-[var(--text-gold)] border-[var(--text-gold)]/30'

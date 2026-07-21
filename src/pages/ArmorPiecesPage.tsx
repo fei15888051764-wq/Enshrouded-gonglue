@@ -1,4 +1,5 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { usePage } from '../App';
 import {
   Shield, ChevronRight, Home, HardHat, Shirt, Hand,
@@ -99,10 +100,28 @@ function PieceCard({ piece }: { piece: ArmorPieceEntry }) {
   );
 }
 
+const slugifySlot = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+const slotFromSlug = (slug?: string) =>
+  slug ? armorPieceCategories.find(c => slugifySlot(c) === slug) : undefined;
+
 export default function ArmorPiecesPage() {
   const { navigate } = usePage();
-  const [activeSlot, setActiveSlot] = useState<string>('All');
-  const [searchQuery, setSearchQuery] = useState('');
+  const { sub } = useParams();
+  const routerNavigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [activeSlot, setActiveSlot] = useState<string>(() => slotFromSlug(sub) ?? 'All');
+  // Deep-link support: /armor-pieces?q=<name> prefills the filter (used by global search)
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get('q') ?? '');
+
+  // Slot pages: /armor-pieces/helmet etc. — URL drives the active tab
+  useEffect(() => {
+    setActiveSlot(slotFromSlug(sub) ?? 'All');
+  }, [sub]);
+
+  const selectSlot = (slot: string) => {
+    setSearchQuery('');
+    routerNavigate(slot === 'All' ? '/armor-pieces' : `/armor-pieces/${slugifySlot(slot)}`);
+  };
 
   const stats = useMemo(() => {
     const rareCount = allArmorPieces.filter(p => p.rarity === 'Rare').length;
@@ -209,10 +228,22 @@ export default function ArmorPiecesPage() {
         />
       </div>
 
+      {/* Slot page heading (only on slot sub-pages) */}
+      {activeSlot !== 'All' && (
+        <div className="game-panel corner-decor p-5 mb-5">
+          <h2 className="font-cinzel text-lg font-bold text-[var(--text-gold)] mb-1">
+            {activeSlot} Armor in Enshrouded
+          </h2>
+          <p className="text-xs text-[var(--text-secondary)]">
+            All {stats.slotCounts[activeSlot]} {activeSlot.toLowerCase()} pieces with armor values, bonus effects, rarities, and set information.
+          </p>
+        </div>
+      )}
+
       {/* Category Tabs */}
       <div className="flex flex-wrap gap-2 mb-6">
         <button
-          onClick={() => setActiveSlot('All')}
+          onClick={() => selectSlot('All')}
           className={`px-3 py-1.5 rounded-sm text-[10px] font-cinzel font-bold uppercase tracking-wider transition-colors border ${
             activeSlot === 'All'
               ? 'bg-[var(--text-gold)]/20 text-[var(--text-gold)] border-[var(--text-gold)]/30'
@@ -224,7 +255,7 @@ export default function ArmorPiecesPage() {
         {armorPieceCategories.map(cat => (
           <button
             key={cat}
-            onClick={() => setActiveSlot(cat)}
+            onClick={() => selectSlot(cat)}
             className={`px-3 py-1.5 rounded-sm text-[10px] font-cinzel font-bold uppercase tracking-wider transition-colors border flex items-center gap-1 ${
               activeSlot === cat
                 ? 'bg-[var(--text-gold)]/20 text-[var(--text-gold)] border-[var(--text-gold)]/30'
