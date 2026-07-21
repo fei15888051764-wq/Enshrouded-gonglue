@@ -5,8 +5,11 @@ import {
   FlaskConical, Apple, TreePine, MapPin
 } from 'lucide-react';
 import PageLayout from './PageLayout';
+import SubsectionCards from '../components/SubsectionCards';
 import { allCraftingItems, craftingCategories } from '../data/craftingDataUnified';
 import type { CraftingEntry } from '../data/craftingDataUnified';
+import { craftingSubSections } from '../data/craftingData';
+import { craftingImages } from '../data/baseCraftingItemsImages';
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   'NPC Artisans': <Users className="w-4 h-4" />,
@@ -184,6 +187,14 @@ export default function CraftingHomePage() {
           <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mt-1">Categories</div>
         </div>
       </div>
+
+      {/* Crafting guide pages */}
+      <SubsectionCards
+        page="crafting"
+        sections={craftingSubSections}
+        images={craftingImages}
+        heading="Crafting Guides"
+      />
 
       {/* Search */}
       <div className="mb-6">
