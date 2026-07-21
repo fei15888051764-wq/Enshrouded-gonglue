@@ -48,6 +48,7 @@ export const mechanicsImages: Record<string, GalleryImage[]> = {
     { src: `${B}/weather-snow-albaneve.webp`, caption: 'Official artwork: snow rules the high country' },
     { src: `${B}/glider-mountains-snow.webp`, caption: 'Rain in the valleys becomes snow on the peaks' },
   ],
+
 };
 
 export const fishingImages: Record<string, GalleryImage[]> = {
@@ -87,4 +88,5 @@ export const fishingImages: Record<string, GalleryImage[]> = {
     { src: `${B}/underwater-swim.webp`, caption: 'Hidden rod weights decide fish vs. treasure vs. boots' },
     { src: `${G}/inventory-backpack.webp`, caption: 'The infamous Wet Boot — now you know why it happens' },
   ],
+
 };

@@ -110,4 +110,5 @@ export const loreImages: Record<string, GalleryImage[]> = {
     { src: `${G}/inventory-backpack.webp`, caption: 'Every book and note feeds the library' },
     { src: `${B}/hud-building-quest.webp`, caption: 'Collect them all to piece the story together' },
   ],
+
 };
