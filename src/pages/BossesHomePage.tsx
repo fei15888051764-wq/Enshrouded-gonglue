@@ -8,6 +8,9 @@ import PageLayout from './PageLayout';
 import { allBosses, bossCategories, DIFFICULTY_COLORS, FACTION_COLORS } from '../data/bossesDataUnified';
 import type { BossEntry } from '../data/bossesDataUnified';
 import { getBossDetailKey } from '../data/bossDetailData';
+import SubsectionCards from '../components/SubsectionCards';
+import { bossesSubSections } from '../data/bossesData';
+import { bossesImages } from '../data/bossesEnemiesImages';
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   'Fell': <Skull className="w-4 h-4" />,
@@ -170,6 +173,14 @@ export default function BossesHomePage() {
           <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mt-1">Quest</div>
         </div>
       </div>
+
+      {/* Boss guide pages */}
+      <SubsectionCards
+        page="bosses"
+        sections={bossesSubSections}
+        images={bossesImages}
+        heading="Boss Guides"
+      />
 
       {/* Search */}
       <div className="mb-6">
