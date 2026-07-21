@@ -6,6 +6,7 @@ import {
   Shield, Target, Clock, Sparkles, Skull
 } from 'lucide-react';
 import PageLayout from './PageLayout';
+import SubPageHero from '../components/SubPageHero';
 import { allWeapons, weaponCategories } from '../data/weaponsDatabaseData';
 import type { WeaponEntry } from '../data/weaponsDatabaseData';
 import weaponImageMap from '../data/weaponImages.json';
@@ -271,6 +272,8 @@ export default function WeaponsDatabasePage() {
         <ChevronRight className="w-3 h-3" />
         <span className="text-[var(--text-gold)]">Weapon Database</span>
       </div>
+
+      <SubPageHero images={[{ src: '/images/beginner/combat-boss.webp', caption: 'Every weapon in Embervale — from crude clubs to legendary greatswords.' }]} />
 
       {/* Overview */}
       <div className="game-panel corner-decor p-6 mb-8">
