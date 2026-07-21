@@ -21,6 +21,18 @@ import { tipsSubSections } from './tipsData';
 import { troubleshootSubSections } from './troubleshootData';
 import { updatesSubSections } from './updatesData';
 import { walkthroughSubSections } from './walkthroughData';
+import { allWeapons, weaponCategories } from './weaponsDatabaseData';
+import { allArmorPieces } from './armorPiecesData';
+
+const weaponCategoryCounts: Record<string, number> = {};
+for (const cat of weaponCategories) {
+  weaponCategoryCounts[cat] = allWeapons.filter(w => w.category === cat).length;
+}
+const armorSlotNames = ['Helmet', 'Chest', 'Gloves', 'Legs', 'Boots'];
+const armorSlotCounts: Record<string, number> = {};
+for (const slot of armorSlotNames) {
+  armorSlotCounts[slot] = allArmorPieces.filter(p => p.slot === slot).length;
+}
 
 export interface SeoMeta {
   title: string;
@@ -97,6 +109,45 @@ const groups: [string, { id: string; title: string; summary?: string; descriptio
 ];
 
 const registry: Record<string, SeoMeta> = {};
+
+/* ---- Weapon category pages: /weaponsdb/<category> ---- */
+const CAT_SLUG = (c: string) => c.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+const WEAPON_CAT_SEO: Record<string, string> = {
+  Daggers: 'fast DEX-scaling daggers for assassin and rogue builds',
+  'One-handed Swords': 'versatile one-handed swords for sword-and-board builds',
+  'One-handed Axes': 'brutal one-handed axes for strength builds',
+  'One-handed Clubs': 'crushing one-handed clubs and maces',
+  'Two-handed Greatswords': 'massive greatswords with high stagger damage',
+  'Two-handed Axes': 'massive two-handed axes with cleaving attacks',
+  'Two-handed Hammers': 'devastating two-handed war hammers',
+  'Two-handed Clubs': 'heavy two-handed clubs for pure strength builds',
+  Bows: 'long-range bows for ranger and marksman builds',
+  'Throwing Weapons': 'throwing knives and javelins for agile ranged fighters',
+  Wands: 'quick-casting magic wands for spell-blade builds',
+  Staves: 'elemental magic staves for mage builds',
+};
+for (const cat of weaponCategories) {
+  registry[`/weaponsdb/${CAT_SLUG(cat)}`] = {
+    title: `${cat} in Enshrouded — All ${weaponCategoryCounts[cat]} With Stats & Locations | ${SITE}`,
+    description: `Every ${cat.toLowerCase().replace(/s$/, '')} in Enshrouded: complete list of ${weaponCategoryCounts[cat]} ${WEAPON_CAT_SEO[cat] ?? cat.toLowerCase()}, with damage, scaling, attack speed, perks, and exact drop locations.`,
+  };
+}
+
+/* ---- Armor slot pages: /armor-pieces/<slot> ---- */
+const SLOT_SEO: Record<string, string> = {
+  Helmet: 'helmets and head armor',
+  Chest: 'chest armor and chestplates',
+  Gloves: 'gloves and gauntlets',
+  Legs: 'leg armor and greaves',
+  Boots: 'boots and footwear',
+};
+for (const slot of armorSlotNames) {
+  registry[`/armor-pieces/${CAT_SLUG(slot)}`] = {
+    title: `${slot} Armor in Enshrouded — All ${armorSlotCounts[slot]} Pieces | ${SITE}`,
+    description: `Complete list of ${armorSlotCounts[slot]} ${SLOT_SEO[slot] ?? slot.toLowerCase()} in Enshrouded — armor values, bonus effects, rarities, levels, and which sets they belong to.`,
+  };
+}
+
 for (const [page, subs] of groups) {
   for (const s of subs) {
     registry[`/${page}/${s.id}`] = {

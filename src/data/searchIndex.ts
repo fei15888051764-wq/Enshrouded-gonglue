@@ -26,6 +26,8 @@ import { updatesSubSections } from './updatesData';
 import { walkthroughSubSections } from './walkthroughData';
 import { bossDetails } from './bossDetailData';
 import weaponsData from './weapons.json';
+import { weaponCategories } from './weaponsDatabaseData';
+import { allArmorPieces } from './armorPiecesData';
 
 export interface SearchItem {
   id: string;
@@ -204,6 +206,55 @@ const armorSetEntries: SearchItem[] = [
   route: { page: 'armor', sub: a.id },
 }));
 
+/* ---------- Weapon category pages (/weaponsdb/<cat>) ---------- */
+const weaponCatEntries: SearchItem[] = weaponCategories.map((cat) => ({
+  id: `weaponcat-${slugify(cat)}`,
+  title: `${cat} — Weapon Category`,
+  category: 'Weapons',
+  description: `All ${cat.toLowerCase()} in Enshrouded with stats, scaling, and locations`,
+  keywords: unique([...words(cat), 'weapons', 'list', 'best']),
+  route: { page: 'weaponsdb' },
+  href: `/weaponsdb/${slugify(cat)}`,
+}));
+
+/* ---------- Armor slot pages + every armor piece ---------- */
+const ARMOR_SLOTS = ['Helmet', 'Chest', 'Gloves', 'Legs', 'Boots'];
+
+const armorSlotEntries: SearchItem[] = ARMOR_SLOTS.map((slot) => ({
+  id: `armorslot-${slugify(slot)}`,
+  title: `${slot} Armor — Slot`,
+  category: 'Armor Pieces',
+  description: `All ${slot.toLowerCase()} armor pieces in Enshrouded with stats and effects`,
+  keywords: unique([...words(slot), 'armor', 'list', 'best']),
+  route: { page: 'armor-pieces' },
+  href: `/armor-pieces/${slugify(slot)}`,
+}));
+
+interface ArmorPieceRow {
+  name: string;
+  slot: string;
+  rarity: string;
+  level: number;
+  setName?: string;
+  effect?: string;
+}
+
+const armorPieceEntries: SearchItem[] = (allArmorPieces as ArmorPieceRow[]).map((p) => ({
+  id: `armorpiece-${slugify(p.name)}`,
+  title: p.name,
+  category: 'Armor Pieces',
+  description: `${p.rarity} ${p.slot} · Lv ${p.level}${p.setName ? ` · ${p.setName}` : ''}`,
+  keywords: unique([
+    ...words(p.name),
+    p.slot.toLowerCase(),
+    p.rarity.toLowerCase(),
+    'armor',
+    ...(p.setName ? words(p.setName) : []),
+  ]),
+  route: { page: 'armor-pieces' },
+  href: `/armor-pieces?q=${encodeURIComponent(p.name)}`,
+}));
+
 /* ---------- Boss entries (all 13 detail pages) ---------- */
 const bossEntries: SearchItem[] = Object.keys(bossDetails).map((key) => {
   const name = (bossDetails as Record<string, { name?: string }>)[key]?.name ?? humanize(key);
@@ -220,7 +271,10 @@ const bossEntries: SearchItem[] = Object.keys(bossDetails).map((key) => {
 export const searchIndex: SearchItem[] = [
   ...sectionEntries,
   ...subEntries,
+  ...weaponCatEntries,
   ...weaponEntries,
+  ...armorSlotEntries,
+  ...armorPieceEntries,
   ...armorSetEntries,
   ...bossEntries,
 ];
