@@ -5,8 +5,11 @@ import {
   FlaskConical, Apple, Skull, Hammer, MapPin
 } from 'lucide-react';
 import PageLayout from './PageLayout';
+import SubsectionCards from '../components/SubsectionCards';
 import { allItems, itemCategories } from '../data/itemsDataUnified';
 import type { ItemEntry } from '../data/itemsDataUnified';
+import { itemsSubSections } from '../data/itemsData';
+import { itemsImages } from '../data/baseCraftingItemsImages';
 
 const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   'Ores & Metals': <Pickaxe className="w-4 h-4" />,
@@ -172,6 +175,14 @@ export default function ItemsHomePage() {
           <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mt-1">Categories</div>
         </div>
       </div>
+
+      {/* Material guide pages */}
+      <SubsectionCards
+        page="items"
+        sections={itemsSubSections}
+        images={itemsImages}
+        heading="Material Guides"
+      />
 
       {/* Search */}
       <div className="mb-6">
