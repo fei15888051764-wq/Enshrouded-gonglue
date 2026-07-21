@@ -4,6 +4,7 @@ import { Skull, ChevronRight, Home, ArrowUp } from 'lucide-react';
 import PageLayout from './PageLayout';
 import { enemiesSubSections } from '../data/enemiesData';
 import SectionGallery from '../components/SectionGallery';
+import SubPageHero from '../components/SubPageHero';
 import { enemiesImages } from '../data/bossesEnemiesImages';
 
 interface EnemiesSubPageProps {
@@ -76,8 +77,9 @@ export default function EnemiesSubPage({ subId }: EnemiesSubPageProps) {
           <ChevronRight className="w-3 h-3" />
           <span className="text-[var(--text-gold)]">{section.title}</span>
         </div>
+        <SubPageHero images={enemiesImages[section.id]} />
         <div className="max-w-4xl">{section.content}</div>
-        <SectionGallery images={enemiesImages[section.id]} />
+        <SectionGallery images={enemiesImages[section.id]} skipFirst />
         <div className="mt-10 pt-6 border-t border-[var(--border-gold)]/20">
           <div className="flex items-center justify-between">
             {prev ? (
