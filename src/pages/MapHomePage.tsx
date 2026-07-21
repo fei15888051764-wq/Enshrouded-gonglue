@@ -7,6 +7,9 @@ import {
 import PageLayout from './PageLayout';
 import { locationEntries, locationCategories } from '../data/mapDatabaseData';
 import type { LocationEntry, LocationCategory } from '../data/mapDatabaseData';
+import SubsectionCards from '../components/SubsectionCards';
+import { mapSubSections } from '../data/mapData';
+import { mapImages } from '../data/mapWalkthroughImages';
 
 /* Category colors — same role as rarity colors on Armor Pieces */
 const CATEGORY_COLORS: Record<LocationCategory, { dot: string; name: string; border: string }> = {
@@ -204,6 +207,14 @@ export default function MapHomePage() {
           <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mt-1">Key Locations</div>
         </div>
       </div>
+
+      {/* Map guide pages */}
+      <SubsectionCards
+        page="map"
+        sections={mapSubSections}
+        images={mapImages}
+        heading="Map & Exploration Guides"
+      />
 
       {/* Search */}
       <div className="mb-6">
