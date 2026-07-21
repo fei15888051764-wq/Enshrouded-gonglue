@@ -51,16 +51,17 @@ export const baseImages: Record<string, GalleryImage[]> = {
     { src: `${G}/crafting-loom.webp`, caption: 'Water wheels and windmills power the late-game Mill' },
     { src: `${B}/hud-building-quest.webp`, caption: 'Plan power before Iron Dust demand spikes' },
   ],
+
 };
 
 export const craftingImages: Record<string, GalleryImage[]> = {
+  'crafting-stations': [
+    { src: `${G}/crafting-axe.webp`, caption: 'Every production chain starts at a station — forge, sawmill, kiln' },
+    { src: `${G}/crafting-loom.webp`, caption: 'Place stations under a roof so artisans work through the night' },
+  ],
   'npc-artisans': [
     { src: `${B}/village-npcs.webp`, caption: 'Each rescued artisan unlocks a crafting discipline' },
     { src: `${B}/campfire-night.webp`, caption: 'Keep them sheltered — happy artisans craft better' },
-  ],
-  'crafting-stations': [
-    { src: `${G}/crafting-axe.webp`, caption: 'From workbench to forge — the station ladder' },
-    { src: `${G}/crafting-loom.webp`, caption: 'The Loom handles fabrics and advanced textiles' },
   ],
   'weapon-recipes': [
     { src: `${W}/barbarian-greatsword.webp`, caption: 'Barbarian Greatsword — crafted two-handed power', contain: true },
