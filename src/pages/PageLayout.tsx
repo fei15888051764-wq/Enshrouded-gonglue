@@ -63,6 +63,12 @@ export default function PageLayout({ title, subtitle, icon, children }: PageLayo
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14">
             <div className="flex items-center gap-3">
+              <button
+                onClick={() => navigate('home')}
+                className="px-3 py-1.5 rounded-sm border border-[var(--border-gold-dim)] hover:border-[var(--border-gold)] text-[var(--text-secondary)] hover:text-[var(--text-gold)] transition-colors text-xs font-cinzel tracking-wider flex items-center gap-1.5"
+              >
+                <Home className="w-3.5 h-3.5" /> Home
+              </button>
               <button 
                 onClick={goBack}
                 className="px-3 py-1.5 rounded-sm border border-[var(--border-gold-dim)] hover:border-[var(--border-gold)] text-[var(--text-secondary)] hover:text-[var(--text-gold)] transition-colors text-xs font-cinzel tracking-wider"
