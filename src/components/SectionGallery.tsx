@@ -3,8 +3,10 @@ import type { GalleryImage } from '../data/skillsBuildsImages';
 
 // Shared screenshot/item gallery for guide sub-pages.
 // `contain` images (item thumbnails) render uncropped on a dark backdrop.
-export default function SectionGallery({ images, heading = 'In-Game Gallery' }: { images?: GalleryImage[]; heading?: string }) {
-  if (!images || images.length === 0) return null;
+export default function SectionGallery({ images, heading = 'In-Game Gallery', skipFirst = false }: { images?: GalleryImage[]; heading?: string; skipFirst?: boolean }) {
+  const shown = skipFirst && images ? images.slice(1) : images;
+  if (!shown || shown.length === 0) return null;
+  images = shown;
   return (
     <div className="mt-8">
       <div className="flex items-center gap-2 mb-3">
