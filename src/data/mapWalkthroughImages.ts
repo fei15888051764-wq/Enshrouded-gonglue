@@ -52,6 +52,7 @@ export const mapImages: Record<string, GalleryImage[]> = {
     { src: `${G}/grappling-hook.webp`, caption: 'The grappling hook opens routes legs never could' },
     { src: `${G}/glider-flying.webp`, caption: 'Altitude is currency — climb first, glide everywhere' },
   ],
+
 };
 
 export const walkthroughImages: Record<string, GalleryImage[]> = {
@@ -111,4 +112,5 @@ export const walkthroughImages: Record<string, GalleryImage[]> = {
     { src: `${G}/combat-boss.webp`, caption: 'The Hollow Halls: six gauntlets of escalating dread' },
     { src: `${B}/night-monster-fight.webp`, caption: 'Bone totems spawn endless waves — destroy them first' },
   ],
+
 };

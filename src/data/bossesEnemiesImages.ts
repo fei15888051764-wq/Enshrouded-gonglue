@@ -40,6 +40,7 @@ export const enemiesImages: Record<string, GalleryImage[]> = {
     { src: `${G}/shroud-gameplay.webp`, caption: 'Entities born of the Shroud itself rule the grey zones' },
     { src: `${G}/shroud-wood.webp`, caption: 'Deep Shroud hides entities found nowhere else' },
   ],
+
 };
 
 export const bossesImages: Record<string, GalleryImage[]> = {
