@@ -2,13 +2,13 @@ import { useState, useEffect } from 'react';
 import { usePage } from '../App';
 import { Crown, ChevronRight, Home, ArrowUp } from 'lucide-react';
 import PageLayout from './PageLayout';
-import SectionGallery from '../components/SectionGallery';
-import SubPageHero from '../components/SubPageHero';
-import { bossesImages } from '../data/bossesEnemiesImages';
 import { bossesSubSections } from '../data/bossesData';
 import { allBosses } from '../data/bossesDataUnified';
 import { getBossDetailKey } from '../data/bossDetailData';
 import { BossCard } from './BossesHomePage';
+import SectionGallery from '../components/SectionGallery';
+import SubPageHero from '../components/SubPageHero';
+import { bossesImages } from '../data/bossesEnemiesImages';
 
 interface BossesSubPageProps {
   subId: string;
@@ -54,7 +54,7 @@ export default function BossesSubPage({ subId }: BossesSubPageProps) {
     return (
       <PageLayout title="Not Found" subtitle="" icon={<Crown className="w-6 h-6 text-[var(--text-gold)]" />}>
         <div className="game-panel corner-decor p-6 text-center">
-          <p className="text-[var(--text-secondary)] text-sm mb-4">This boss guide could not be found.</p>
+          <p className="text-[var(--text-secondary)] text-sm mb-4">This boss topic could not be found.</p>
           <button onClick={() => navigate('bosses')} className="game-btn px-4 py-2 text-xs">Back to Bosses</button>
         </div>
       </PageLayout>
