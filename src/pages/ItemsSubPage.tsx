@@ -35,18 +35,16 @@ function SubNav({ activeId, onNavigate }: { activeId: string; onNavigate: (id: s
 
 export default function ItemsSubPage({ subId }: ItemsSubPageProps) {
   const { navigate } = usePage();
-  const [currentSubId, setCurrentSubId] = useState(subId);
   const [showTopBtn, setShowTopBtn] = useState(false);
 
-  useEffect(() => { setCurrentSubId(subId); }, [subId]);
   useEffect(() => {
     const handleScroll = () => setShowTopBtn(window.scrollY > 500);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleNav = (id: string) => { setCurrentSubId(id); window.scrollTo(0, 0); };
-  const section = itemsSubSections.find((s) => s.id === currentSubId);
+  const handleNav = (id: string) => { navigate('items', id); };
+  const section = itemsSubSections.find((s) => s.id === subId);
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
   if (!section) {
@@ -60,13 +58,13 @@ export default function ItemsSubPage({ subId }: ItemsSubPageProps) {
     );
   }
 
-  const idx = itemsSubSections.findIndex((s) => s.id === currentSubId);
+  const idx = itemsSubSections.findIndex((s) => s.id === subId);
   const prev = idx > 0 ? itemsSubSections[idx - 1] : null;
   const next = idx < itemsSubSections.length - 1 ? itemsSubSections[idx + 1] : null;
 
   return (
     <PageLayout title={section.title} subtitle="Items & Builds" icon={<>{section.icon}</>}>
-      <SubNav activeId={currentSubId} onNavigate={handleNav} />
+      <SubNav activeId={subId} onNavigate={handleNav} />
       <div className="max-w-5xl mx-auto px-4 py-6">
         <div className="flex items-center gap-2 mb-6 text-xs text-[var(--text-muted)] flex-wrap">
           <button onClick={() => navigate('home')} className="flex items-center gap-1 hover:text-[var(--text-gold)] transition-colors">

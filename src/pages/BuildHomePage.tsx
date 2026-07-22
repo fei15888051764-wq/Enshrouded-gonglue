@@ -16,7 +16,7 @@ const TIER_COLORS: Record<string, string> = {
   B: 'text-blue-400',
 };
 
-function BuildMiniCard({ build, onClick }: { build: BuildGuide; onClick: () => void }) {
+export function BuildMiniCard({ build, onClick }: { build: BuildGuide; onClick: () => void }) {
   return (
     <button
       onClick={onClick}
@@ -133,33 +133,30 @@ export default function BuildHomePage() {
         </div>
       </div>
 
-      {/* Build Categories */}
-      <div className="space-y-8">
+      {/* Build Category Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {buildSubSections.map((section) => (
-          <div key={section.id}>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-[var(--border-gold)]/10 flex items-center justify-center flex-shrink-0">
+          <button
+            key={section.id}
+            onClick={() => navigate('builds', section.id)}
+            className="game-panel corner-decor p-5 text-left hover:border-[var(--border-gold-light)] transition-all group cursor-pointer"
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-12 h-12 rounded-lg bg-[var(--border-gold)]/10 flex items-center justify-center text-[var(--text-gold)] group-hover:bg-[var(--text-gold)]/20 transition-colors flex-shrink-0">
                 {section.icon}
               </div>
-              <div>
-                <h3 className="font-cinzel text-sm font-bold text-[var(--text-primary)]">{section.title}</h3>
-                <p className="text-[10px] text-[var(--text-muted)]">{section.description}</p>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-cinzel text-sm font-bold text-[var(--text-primary)] mb-1 group-hover:text-[var(--text-gold)] transition-colors">
+                  {section.title}
+                </h3>
+                <p className="text-xs text-[var(--text-muted)] line-clamp-2">{section.description}</p>
+                <p className="text-[10px] text-[var(--text-gold)] mt-1.5">
+                  {section.builds.length} {section.builds.length === 1 ? 'build' : 'builds'}
+                </p>
               </div>
-              <div className="ml-auto text-[10px] text-[var(--text-muted)] bg-[var(--bg-secondary)] px-2 py-1 rounded">
-                {section.builds.length} {section.builds.length === 1 ? 'build' : 'builds'}
-              </div>
+              <ChevronRight className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--text-gold)] transition-colors flex-shrink-0 mt-1" />
             </div>
-
-            <div className={`grid gap-3 ${section.builds.length > 1 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
-              {section.builds.map((build) => (
-                <BuildMiniCard
-                  key={build.id}
-                  build={build}
-                  onClick={() => navigate('builds', build.id)}
-                />
-              ))}
-            </div>
-          </div>
+          </button>
         ))}
       </div>
     </PageLayout>

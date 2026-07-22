@@ -1,27 +1,16 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { usePage } from '../App';
 import {
-  Crown, ChevronRight, Home, Skull, Swords,
-  Flame, Star, Zap, ArrowRight
+  Crown, ChevronRight, Home, ArrowRight
 } from 'lucide-react';
 import PageLayout from './PageLayout';
 import { allBosses, bossCategories, DIFFICULTY_COLORS, FACTION_COLORS } from '../data/bossesDataUnified';
 import type { BossEntry } from '../data/bossesDataUnified';
-import { getBossDetailKey } from '../data/bossDetailData';
 import SubsectionCards from '../components/SubsectionCards';
 import { bossesSubSections } from '../data/bossesData';
 import { bossesImages } from '../data/bossesEnemiesImages';
 
-const CATEGORY_ICONS: Record<string, React.ReactNode> = {
-  'Fell': <Skull className="w-4 h-4" />,
-  'Scavenger': <Swords className="w-4 h-4" />,
-  'Vukah': <Flame className="w-4 h-4" />,
-  'Hollow': <Star className="w-4 h-4" />,
-  'Cyclops': <Zap className="w-4 h-4" />,
-  'Drak': <Crown className="w-4 h-4" />,
-};
-
-function BossCard({ boss, onClick }: { boss: BossEntry; onClick: () => void }) {
+export function BossCard({ boss, onClick }: { boss: BossEntry; onClick: () => void }) {
   const dc = DIFFICULTY_COLORS[boss.difficulty] || DIFFICULTY_COLORS['Hard'];
   const fc = FACTION_COLORS[boss.faction] || 'text-gray-400';
   return (
@@ -74,9 +63,6 @@ function BossCard({ boss, onClick }: { boss: BossEntry; onClick: () => void }) {
 
 export default function BossesHomePage() {
   const { navigate } = usePage();
-  const [activeCategory, setActiveCategory] = useState<string>('All');
-  const [searchQuery, setSearchQuery] = useState('');
-
   const stats = useMemo(() => {
     const factionCount = new Set(allBosses.map(b => b.faction)).size;
     const flameUpgrades = allBosses.filter(b => b.flameAltar && b.flameAltar !== '—').length;
@@ -94,37 +80,12 @@ export default function BossesHomePage() {
     };
   }, []);
 
-  const filteredBosses = useMemo(() => {
-    let filtered = allBosses;
-    if (activeCategory !== 'All') {
-      filtered = filtered.filter(b => b.category === activeCategory);
-    }
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      filtered = filtered.filter(b =>
-        b.name.toLowerCase().includes(q) ||
-        b.faction.toLowerCase().includes(q) ||
-        b.region.toLowerCase().includes(q) ||
-        b.desc.toLowerCase().includes(q) ||
-        b.effective.toLowerCase().includes(q)
-      );
-    }
-    return [...filtered].sort((a, b) => {
-      const levelA = parseInt(a.level.split('-')[0]) || 0;
-      const levelB = parseInt(b.level.split('-')[0]) || 0;
-      return levelA - levelB;
-    });
-  }, [activeCategory, searchQuery]);
 
-  const handleBossClick = (boss: BossEntry) => {
-    const key = getBossDetailKey(boss.name);
-    navigate('bosses', key);
-  };
 
   return (
     <PageLayout
       title="Bosses"
-      subtitle="13 boss encounters across 6 factions — click any card for full details"
+      subtitle="13 boss encounters across 6 factions — pick a guide below"
       icon={<Crown className="w-6 h-6 text-[var(--text-gold)]" />}
     >
       {/* Breadcrumb */}
@@ -142,8 +103,8 @@ export default function BossesHomePage() {
         <p className="text-[var(--text-secondary)] text-sm leading-relaxed mb-4">
           Enshrouded features <strong className="text-[var(--text-primary)]">13 boss encounters</strong> across{' '}
           <strong className="text-[var(--text-primary)]">6 unique factions</strong>. Each faction has distinct 
-          attack patterns, damage resistances, and drop tables. Click any boss card below to view full 
-          details including attack patterns, combat strategy, preparation checklist, and damage resistance charts.
+          attack patterns, damage resistances, and drop tables. Open <strong className="text-[var(--text-gold)]">Boss Overview</strong> for
+          the full boss directory, or dive into the progression guides below for strategies and preparation checklists.
         </p>
         <div className="flex flex-wrap gap-2 text-[10px]">
           <span className="px-2 py-1 rounded bg-green-400/10 text-green-400 border border-green-400/20">Easy</span>
@@ -181,65 +142,6 @@ export default function BossesHomePage() {
         images={bossesImages}
         heading="Boss Guides"
       />
-
-      {/* Search */}
-      <div className="mb-6">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-          placeholder="Search bosses by name, faction, region, or damage type..."
-          className="w-full bg-[var(--bg-secondary)] border border-[var(--border-gold-dim)] rounded-sm px-4 py-3 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--border-gold)]"
-        />
-      </div>
-
-      {/* Category Tabs */}
-      <div className="flex flex-wrap gap-2 mb-6">
-        <button
-          onClick={() => setActiveCategory('All')}
-          className={`px-3 py-1.5 rounded-sm text-[10px] font-cinzel font-bold uppercase tracking-wider transition-colors border ${
-            activeCategory === 'All'
-              ? 'bg-[var(--text-gold)]/20 text-[var(--text-gold)] border-[var(--text-gold)]/30'
-              : 'bg-[var(--bg-secondary)] text-[var(--text-muted)] border-[var(--border-gold-dim)] hover:text-[var(--text-primary)] hover:border-[var(--border-gold)]'
-          }`}
-        >
-          All ({stats.total})
-        </button>
-        {bossCategories.map(cat => (
-          <button
-            key={cat}
-            onClick={() => setActiveCategory(cat)}
-            className={`px-3 py-1.5 rounded-sm text-[10px] font-cinzel font-bold uppercase tracking-wider transition-colors border flex items-center gap-1 ${
-              activeCategory === cat
-                ? 'bg-[var(--text-gold)]/20 text-[var(--text-gold)] border-[var(--text-gold)]/30'
-                : 'bg-[var(--bg-secondary)] text-[var(--text-muted)] border-[var(--border-gold-dim)] hover:text-[var(--text-primary)] hover:border-[var(--border-gold)]'
-            }`}
-          >
-            {CATEGORY_ICONS[cat]} {cat} ({stats.catCounts[cat]})
-          </button>
-        ))}
-      </div>
-
-      {/* Results */}
-      <div className="text-[10px] text-[var(--text-muted)] mb-4">
-        Showing {filteredBosses.length} of {stats.total} bosses
-        {activeCategory !== 'All' && ` in ${activeCategory}`}
-        {searchQuery && ` matching "${searchQuery}"`}
-      </div>
-
-      {/* Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {filteredBosses.map(boss => (
-          <BossCard key={boss.name} boss={boss} onClick={() => handleBossClick(boss)} />
-        ))}
-      </div>
-
-      {filteredBosses.length === 0 && (
-        <div className="text-center py-20 text-[var(--text-muted)]">
-          <Skull className="w-12 h-12 mx-auto mb-4 opacity-30" />
-          <p className="text-sm">No bosses found matching your filters.</p>
-        </div>
-      )}
     </PageLayout>
   );
 }

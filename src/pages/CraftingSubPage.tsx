@@ -6,6 +6,9 @@ import SectionGallery from '../components/SectionGallery';
 import SubPageHero from '../components/SubPageHero';
 import { craftingImages } from '../data/baseCraftingItemsImages';
 import { craftingSubSections } from '../data/craftingData';
+import { allCraftingItems, craftingSubExtras } from '../data/craftingDataUnified';
+import { CraftingCard } from './CraftingHomePage';
+
 
 interface CraftingSubPageProps {
   subId: string;
@@ -35,18 +38,16 @@ function SubNav({ activeId, onNavigate }: { activeId: string; onNavigate: (id: s
 
 export default function CraftingSubPage({ subId }: CraftingSubPageProps) {
   const { navigate } = usePage();
-  const [currentSubId, setCurrentSubId] = useState(subId);
   const [showTopBtn, setShowTopBtn] = useState(false);
 
-  useEffect(() => { setCurrentSubId(subId); }, [subId]);
   useEffect(() => {
     const handleScroll = () => setShowTopBtn(window.scrollY > 500);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleNav = (id: string) => { setCurrentSubId(id); window.scrollTo(0, 0); };
-  const section = craftingSubSections.find((s) => s.id === currentSubId);
+  const handleNav = (id: string) => { navigate('crafting', id); };
+  const section = craftingSubSections.find((s) => s.id === subId);
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
   if (!section) {
@@ -60,13 +61,13 @@ export default function CraftingSubPage({ subId }: CraftingSubPageProps) {
     );
   }
 
-  const idx = craftingSubSections.findIndex((s) => s.id === currentSubId);
+  const idx = craftingSubSections.findIndex((s) => s.id === subId);
   const prev = idx > 0 ? craftingSubSections[idx - 1] : null;
   const next = idx < craftingSubSections.length - 1 ? craftingSubSections[idx + 1] : null;
 
   return (
     <PageLayout title={section.title} subtitle="Crafting & Builds" icon={<>{section.icon}</>}>
-      <SubNav activeId={currentSubId} onNavigate={handleNav} />
+      <SubNav activeId={subId} onNavigate={handleNav} />
       <div className="max-w-5xl mx-auto px-4 py-6">
         <div className="flex items-center gap-2 mb-6 text-xs text-[var(--text-muted)] flex-wrap">
           <button onClick={() => navigate('home')} className="flex items-center gap-1 hover:text-[var(--text-gold)] transition-colors">
@@ -79,6 +80,20 @@ export default function CraftingSubPage({ subId }: CraftingSubPageProps) {
         </div>
         <SubPageHero images={craftingImages[section.id]} />
         <div className="max-w-4xl">{section.content}</div>
+        {craftingSubExtras[section.id] && (
+          <div className="mt-8">
+            <h2 className="font-cinzel text-sm font-bold text-[var(--text-gold)] uppercase tracking-wider mb-3">
+              More {section.title}
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {allCraftingItems
+                .filter((it) => craftingSubExtras[section.id].includes(it.name))
+                .map((it) => (
+                  <CraftingCard key={it.name} item={it} />
+                ))}
+            </div>
+          </div>
+        )}
         <SectionGallery images={craftingImages[section.id]} skipFirst />
         <div className="mt-10 pt-6 border-t border-[var(--border-gold)]/20">
           <div className="flex items-center justify-between">

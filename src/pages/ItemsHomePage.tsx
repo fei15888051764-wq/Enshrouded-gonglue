@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { usePage } from '../App';
 import {
   Package, ChevronRight, Home, Pickaxe, TreePine, Shield,
@@ -11,7 +11,7 @@ import type { ItemEntry } from '../data/itemsDataUnified';
 import { itemsSubSections } from '../data/itemsData';
 import { itemsImages } from '../data/baseCraftingItemsImages';
 
-const CATEGORY_ICONS: Record<string, React.ReactNode> = {
+export const CATEGORY_ICONS: Record<string, React.ReactNode> = {
   'Ores & Metals': <Pickaxe className="w-4 h-4" />,
   'Wood & Fibers': <TreePine className="w-4 h-4" />,
   'Fabrics & Leather': <Shield className="w-4 h-4" />,
@@ -30,7 +30,7 @@ const RARITY_COLORS: Record<string, { dot: string; name: string; border: string 
   Collectible: { dot: 'bg-pink-400',  name: 'text-pink-400',          border: 'border-pink-500/30' },
 };
 
-function ItemCard({ item }: { item: ItemEntry }) {
+export function ItemCard({ item }: { item: ItemEntry }) {
   const rc = RARITY_COLORS[item.rarity] || RARITY_COLORS['Common'];
   return (
     <div className={`game-panel corner-decor transition-all hover:border-[var(--border-gold-light)] group ${rc.border}`}>
@@ -79,9 +79,6 @@ function ItemCard({ item }: { item: ItemEntry }) {
 
 export default function ItemsHomePage() {
   const { navigate } = usePage();
-  const [activeCategory, setActiveCategory] = useState<string>('All');
-  const [searchQuery, setSearchQuery] = useState('');
-
   const stats = useMemo(() => {
     const uncommonCount = allItems.filter(p => p.rarity === 'Uncommon').length;
     const rareCount = allItems.filter(p => p.rarity === 'Rare').length;
@@ -100,29 +97,6 @@ export default function ItemsHomePage() {
     };
   }, []);
 
-  const filteredItems = useMemo(() => {
-    let filtered = allItems;
-    if (activeCategory !== 'All') {
-      filtered = filtered.filter(p => p.category === activeCategory);
-    }
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      filtered = filtered.filter(p =>
-        p.name.toLowerCase().includes(q) ||
-        p.type.toLowerCase().includes(q) ||
-        p.desc.toLowerCase().includes(q) ||
-        p.category.toLowerCase().includes(q)
-      );
-    }
-    return [...filtered].sort((a, b) => {
-      if (activeCategory === 'All') {
-        const catOrder: string[] = [...itemCategories];
-        const catDiff = catOrder.indexOf(a.category) - catOrder.indexOf(b.category);
-        if (catDiff !== 0) return catDiff;
-      }
-      return a.name.localeCompare(b.name);
-    });
-  }, [activeCategory, searchQuery]);
 
   return (
     <PageLayout
@@ -184,64 +158,6 @@ export default function ItemsHomePage() {
         heading="Material Guides"
       />
 
-      {/* Search */}
-      <div className="mb-6">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-          placeholder="Search items by name, type, description, or category..."
-          className="w-full bg-[var(--bg-secondary)] border border-[var(--border-gold-dim)] rounded-sm px-4 py-3 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--border-gold)]"
-        />
-      </div>
-
-      {/* Category Tabs */}
-      <div className="flex flex-wrap gap-2 mb-6">
-        <button
-          onClick={() => setActiveCategory('All')}
-          className={`px-3 py-1.5 rounded-sm text-[10px] font-cinzel font-bold uppercase tracking-wider transition-colors border ${
-            activeCategory === 'All'
-              ? 'bg-[var(--text-gold)]/20 text-[var(--text-gold)] border-[var(--text-gold)]/30'
-              : 'bg-[var(--bg-secondary)] text-[var(--text-muted)] border-[var(--border-gold-dim)] hover:text-[var(--text-primary)] hover:border-[var(--border-gold)]'
-          }`}
-        >
-          All ({stats.total})
-        </button>
-        {itemCategories.map(cat => (
-          <button
-            key={cat}
-            onClick={() => setActiveCategory(cat)}
-            className={`px-3 py-1.5 rounded-sm text-[10px] font-cinzel font-bold uppercase tracking-wider transition-colors border flex items-center gap-1 ${
-              activeCategory === cat
-                ? 'bg-[var(--text-gold)]/20 text-[var(--text-gold)] border-[var(--text-gold)]/30'
-                : 'bg-[var(--bg-secondary)] text-[var(--text-muted)] border-[var(--border-gold-dim)] hover:text-[var(--text-primary)] hover:border-[var(--border-gold)]'
-            }`}
-          >
-            {CATEGORY_ICONS[cat]} {cat} ({stats.catCounts[cat]})
-          </button>
-        ))}
-      </div>
-
-      {/* Results */}
-      <div className="text-[10px] text-[var(--text-muted)] mb-4">
-        Showing {filteredItems.length} of {stats.total} items
-        {activeCategory !== 'All' && ` in ${activeCategory}`}
-        {searchQuery && ` matching "${searchQuery}"`}
-      </div>
-
-      {/* Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {filteredItems.map(item => (
-          <ItemCard key={item.name} item={item} />
-        ))}
-      </div>
-
-      {filteredItems.length === 0 && (
-        <div className="text-center py-20 text-[var(--text-muted)]">
-          <Package className="w-12 h-12 mx-auto mb-4 opacity-30" />
-          <p className="text-sm">No items found matching your filters.</p>
-        </div>
-      )}
     </PageLayout>
   );
 }

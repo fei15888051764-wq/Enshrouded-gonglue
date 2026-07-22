@@ -2,38 +2,6 @@ import { usePage } from '../App';
 import { ChevronRight, Home, Shield, Star } from 'lucide-react';
 import PageLayout from './PageLayout';
 import { armorSubSections } from '../data/armorData';
-import type { ArmorPiece } from '../data/armorData';
-import { TIER_COLORS, TYPE_COLORS } from '../data/armorData';
-
-function ArmorMiniCard({ armor, onClick }: { armor: ArmorPiece; onClick: () => void }) {
-  return (
-    <button
-      onClick={onClick}
-      className="game-panel corner-decor p-3 text-left hover:border-[var(--border-gold-light)] transition-all group cursor-pointer w-full"
-    >
-      <div className="flex items-start gap-3">
-        <div className="w-10 h-10 rounded-lg bg-[var(--border-gold)]/10 flex items-center justify-center text-[var(--text-gold)] group-hover:bg-[var(--text-gold)]/20 transition-colors flex-shrink-0">
-          {armor.icon}
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-0.5">
-            <h4 className="font-cinzel text-xs font-bold text-[var(--text-primary)] group-hover:text-[var(--text-gold)] transition-colors truncate">
-              {armor.name}
-            </h4>
-            <span className={`text-[9px] font-bold ${TIER_COLORS[armor.tier]}`}>{armor.tier}-Tier</span>
-          </div>
-          <div className="flex items-center gap-2 text-[9px] text-[var(--text-muted)] mb-1">
-            <span className={`px-1.5 py-0.5 rounded border ${TYPE_COLORS[armor.type]}`}>{armor.type}</span>
-            <span>Lv.{armor.level}</span>
-            <span>{armor.defense} DEF</span>
-          </div>
-          <p className="text-[10px] text-[var(--text-secondary)] line-clamp-2 leading-relaxed">{armor.description}</p>
-        </div>
-        <ChevronRight className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--text-gold)] transition-colors flex-shrink-0 mt-1" />
-      </div>
-    </button>
-  );
-}
 
 export default function ArmorHomePage() {
   const { navigate } = usePage();
@@ -114,33 +82,30 @@ export default function ArmorHomePage() {
         </div>
       </div>
 
-      {/* Armor Categories */}
-      <div className="space-y-8">
+      {/* Tier Section Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {armorSubSections.map((section) => (
-          <div key={section.id}>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-lg bg-[var(--border-gold)]/10 flex items-center justify-center flex-shrink-0">
-                <Shield className="w-5 h-5 text-[var(--text-gold)]" />
+          <button
+            key={section.id}
+            onClick={() => navigate('armor', section.id)}
+            className="game-panel corner-decor p-5 text-left hover:border-[var(--border-gold-light)] transition-all group cursor-pointer"
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-12 h-12 rounded-lg bg-[var(--border-gold)]/10 flex items-center justify-center text-[var(--text-gold)] group-hover:bg-[var(--text-gold)]/20 transition-colors flex-shrink-0">
+                <Shield className="w-5 h-5" />
               </div>
-              <div>
-                <h3 className="font-cinzel text-sm font-bold text-[var(--text-primary)]">{section.title}</h3>
-                <p className="text-[10px] text-[var(--text-muted)]">{section.description}</p>
+              <div className="flex-1 min-w-0">
+                <h3 className="font-cinzel text-sm font-bold text-[var(--text-primary)] mb-1 group-hover:text-[var(--text-gold)] transition-colors">
+                  {section.title}
+                </h3>
+                <p className="text-xs text-[var(--text-muted)] line-clamp-2">{section.description}</p>
+                <p className="text-[10px] text-[var(--text-gold)] mt-1.5">
+                  {section.armor.length} {section.armor.length === 1 ? 'set' : 'sets'}
+                </p>
               </div>
-              <div className="ml-auto text-[10px] text-[var(--text-muted)] bg-[var(--bg-secondary)] px-2 py-1 rounded">
-                {section.armor.length} {section.armor.length === 1 ? 'set' : 'sets'}
-              </div>
+              <ChevronRight className="w-4 h-4 text-[var(--text-muted)] group-hover:text-[var(--text-gold)] transition-colors flex-shrink-0 mt-1" />
             </div>
-
-            <div className={`grid gap-3 ${section.armor.length > 1 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1'}`}>
-              {section.armor.map((armor) => (
-                <ArmorMiniCard
-                  key={armor.id}
-                  armor={armor}
-                  onClick={() => navigate('armor', armor.id)}
-                />
-              ))}
-            </div>
-          </div>
+          </button>
         ))}
       </div>
     </PageLayout>

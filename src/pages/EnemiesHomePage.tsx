@@ -1,8 +1,7 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { usePage } from '../App';
 import {
-  Skull, ChevronRight, Home, Bug, Sword, Cat,
-  Ghost, Bird, Diamond, AlertTriangle, MapPin
+  Skull, ChevronRight, Home, MapPin
 } from 'lucide-react';
 import PageLayout from './PageLayout';
 import SubsectionCards from '../components/SubsectionCards';
@@ -11,17 +10,7 @@ import type { EnemyEntry } from '../data/enemiesDataUnified';
 import { enemiesSubSections } from '../data/enemiesData';
 import { enemiesImages } from '../data/bossesEnemiesImages';
 
-const CATEGORY_ICONS: Record<string, React.ReactNode> = {
-  'Fell': <Bug className="w-4 h-4" />,
-  'Scavenger': <Sword className="w-4 h-4" />,
-  'Vukah': <Cat className="w-4 h-4" />,
-  'Hollow': <Ghost className="w-4 h-4" />,
-  'Wildlife': <Bird className="w-4 h-4" />,
-  'Drak': <Diamond className="w-4 h-4" />,
-  'Shroud Entity': <AlertTriangle className="w-4 h-4" />,
-};
-
-function EnemyCard({ enemy }: { enemy: EnemyEntry }) {
+export function EnemyCard({ enemy }: { enemy: EnemyEntry }) {
   const fc = FACTION_COLORS[enemy.faction] || 'text-gray-400';
   const isPassive = enemy.type === 'Passive';
   return (
@@ -76,9 +65,6 @@ function EnemyCard({ enemy }: { enemy: EnemyEntry }) {
 
 export default function EnemiesHomePage() {
   const { navigate } = usePage();
-  const [activeCategory, setActiveCategory] = useState<string>('All');
-  const [searchQuery, setSearchQuery] = useState('');
-
   const stats = useMemo(() => {
     const factionCount = new Set(allEnemies.map(e => e.faction)).size;
     const aggressiveCount = allEnemies.filter(e => e.type !== 'Passive').length;
@@ -96,31 +82,6 @@ export default function EnemiesHomePage() {
     };
   }, []);
 
-  const filteredEnemies = useMemo(() => {
-    let filtered = allEnemies;
-    if (activeCategory !== 'All') {
-      filtered = filtered.filter(e => e.category === activeCategory);
-    }
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      filtered = filtered.filter(e =>
-        e.name.toLowerCase().includes(q) ||
-        e.faction.toLowerCase().includes(q) ||
-        e.biome.toLowerCase().includes(q) ||
-        e.desc.toLowerCase().includes(q) ||
-        e.drops.toLowerCase().includes(q) ||
-        e.type.toLowerCase().includes(q)
-      );
-    }
-    return [...filtered].sort((a, b) => {
-      if (activeCategory === 'All') {
-        const catOrder: string[] = [...enemyCategories];
-        const catDiff = catOrder.indexOf(a.category) - catOrder.indexOf(b.category);
-        if (catDiff !== 0) return catDiff;
-      }
-      return a.name.localeCompare(b.name);
-    });
-  }, [activeCategory, searchQuery]);
 
   return (
     <PageLayout
@@ -142,7 +103,7 @@ export default function EnemiesHomePage() {
         <p className="text-[var(--text-secondary)] text-sm leading-relaxed mb-4">
           Embervale is home to <strong className="text-[var(--text-primary)]">7 hostile factions</strong> and dozens of creature types. 
           From the Shroud-corrupted <strong className="text-purple-400">Fell</strong> to the reptilian <strong className="text-teal-400">Drak</strong> of Veilwater Basin, 
-          each enemy has unique weaknesses and drop tables. Use the faction tabs to filter, or search by name, biome, or drops. 
+          each enemy has unique weaknesses and drop tables. Pick a faction below to browse its creatures, drops, and weaknesses. 
           <strong className="text-green-400"> Passive</strong> creatures are highlighted in green.
         </p>
         <div className="flex flex-wrap gap-2 text-[10px]">
@@ -183,65 +144,6 @@ export default function EnemiesHomePage() {
         images={enemiesImages}
         heading="Faction Guides"
       />
-
-      {/* Search */}
-      <div className="mb-6">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-          placeholder="Search enemies by name, faction, biome, drops, or type..."
-          className="w-full bg-[var(--bg-secondary)] border border-[var(--border-gold-dim)] rounded-sm px-4 py-3 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--border-gold)]"
-        />
-      </div>
-
-      {/* Category Tabs */}
-      <div className="flex flex-wrap gap-2 mb-6">
-        <button
-          onClick={() => setActiveCategory('All')}
-          className={`px-3 py-1.5 rounded-sm text-[10px] font-cinzel font-bold uppercase tracking-wider transition-colors border ${
-            activeCategory === 'All'
-              ? 'bg-[var(--text-gold)]/20 text-[var(--text-gold)] border-[var(--text-gold)]/30'
-              : 'bg-[var(--bg-secondary)] text-[var(--text-muted)] border-[var(--border-gold-dim)] hover:text-[var(--text-primary)] hover:border-[var(--border-gold)]'
-          }`}
-        >
-          All ({stats.total})
-        </button>
-        {enemyCategories.map(cat => (
-          <button
-            key={cat}
-            onClick={() => setActiveCategory(cat)}
-            className={`px-3 py-1.5 rounded-sm text-[10px] font-cinzel font-bold uppercase tracking-wider transition-colors border flex items-center gap-1 ${
-              activeCategory === cat
-                ? 'bg-[var(--text-gold)]/20 text-[var(--text-gold)] border-[var(--text-gold)]/30'
-                : 'bg-[var(--bg-secondary)] text-[var(--text-muted)] border-[var(--border-gold-dim)] hover:text-[var(--text-primary)] hover:border-[var(--border-gold)]'
-            }`}
-          >
-            {CATEGORY_ICONS[cat]} {cat} ({stats.catCounts[cat]})
-          </button>
-        ))}
-      </div>
-
-      {/* Results */}
-      <div className="text-[10px] text-[var(--text-muted)] mb-4">
-        Showing {filteredEnemies.length} of {stats.total} creatures
-        {activeCategory !== 'All' && ` in ${activeCategory}`}
-        {searchQuery && ` matching "${searchQuery}"`}
-      </div>
-
-      {/* Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {filteredEnemies.map(enemy => (
-          <EnemyCard key={enemy.name} enemy={enemy} />
-        ))}
-      </div>
-
-      {filteredEnemies.length === 0 && (
-        <div className="text-center py-20 text-[var(--text-muted)]">
-          <Skull className="w-12 h-12 mx-auto mb-4 opacity-30" />
-          <p className="text-sm">No enemies found matching your filters.</p>
-        </div>
-      )}
     </PageLayout>
   );
 }
