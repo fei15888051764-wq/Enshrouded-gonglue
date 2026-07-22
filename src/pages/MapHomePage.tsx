@@ -1,106 +1,68 @@
 import { useState, useMemo } from 'react';
 import { usePage } from '../App';
 import {
-  Map, ChevronRight, Home, Star, MapPin, TreePine, TowerControl, Castle,
-  Landmark, Mountain, Sun, Snowflake, Droplets, Skull, Gem, Tent, Pickaxe, Layers
+  Map, ChevronRight, Home, Search, Castle, Landmark,
+  Mountain, Coins, Skull, Shield, Star, Compass, MapPin
 } from 'lucide-react';
 import PageLayout from './PageLayout';
+import SubsectionCards from '../components/SubsectionCards';
 import { locationEntries, locationCategories } from '../data/mapDatabaseData';
 import type { LocationEntry, LocationCategory } from '../data/mapDatabaseData';
-import SubsectionCards from '../components/SubsectionCards';
 import { mapSubSections } from '../data/mapData';
 import { mapImages } from '../data/mapWalkthroughImages';
 
-/* Category colors — same role as rarity colors on Armor Pieces */
-const CATEGORY_COLORS: Record<LocationCategory, { dot: string; name: string; border: string }> = {
-  biome:      { dot: 'bg-[var(--text-gold)]', name: 'text-[var(--text-gold)]', border: 'border-[var(--border-gold)]/40' },
-  spire:      { dot: 'bg-blue-400',   name: 'text-blue-400',   border: 'border-blue-500/30' },
-  hollow:     { dot: 'bg-red-400',    name: 'text-red-400',    border: 'border-red-500/30' },
-  vault:      { dot: 'bg-purple-400', name: 'text-purple-400', border: 'border-purple-500/30' },
-  temple:     { dot: 'bg-amber-400',  name: 'text-amber-400',  border: 'border-amber-500/30' },
-  settlement: { dot: 'bg-yellow-400', name: 'text-yellow-400', border: 'border-yellow-500/30' },
-  mine:       { dot: 'bg-gray-400',   name: 'text-gray-300',   border: 'border-gray-500/30' },
-  landmark:   { dot: 'bg-orange-400', name: 'text-orange-400', border: 'border-orange-500/30' },
-  system:     { dot: 'bg-teal-400',   name: 'text-teal-400',   border: 'border-teal-500/30' },
+const CATEGORY_META: Record<LocationCategory, { label: string; icon: React.ReactNode; color: string; badge: string }> = {
+  spire:      { label: 'Ancient Spire',    icon: <Castle className="w-3 h-3" />,   color: 'text-yellow-400',  badge: 'bg-yellow-400/10 border-yellow-400/30' },
+  hollow:     { label: 'Hollow Halls',     icon: <Skull className="w-3 h-3" />,    color: 'text-purple-400',  badge: 'bg-purple-400/10 border-purple-400/30' },
+  vault:      { label: 'Ancient Vault',    icon: <Landmark className="w-3 h-3" />, color: 'text-blue-400',    badge: 'bg-blue-400/10 border-blue-400/30' },
+  temple:     { label: 'Temple / Well',    icon: <Landmark className="w-3 h-3" />, color: 'text-teal-400',    badge: 'bg-teal-400/10 border-teal-400/30' },
+  settlement: { label: 'Settlement',       icon: <Home className="w-3 h-3" />,     color: 'text-green-400',   badge: 'bg-green-400/10 border-green-400/30' },
+  mine:       { label: 'Mine / Quarry',    icon: <Mountain className="w-3 h-3" />, color: 'text-orange-400',  badge: 'bg-orange-400/10 border-orange-400/30' },
+  landmark:   { label: 'Landmark',         icon: <MapPin className="w-3 h-3" />,   color: 'text-gray-300',    badge: 'bg-gray-400/10 border-gray-400/30' },
+  system:     { label: 'POI System',       icon: <Coins className="w-3 h-3" />,    color: 'text-pink-400',    badge: 'bg-pink-400/10 border-pink-400/30' },
+  biome:      { label: 'Biome',            icon: <Mountain className="w-3 h-3" />, color: 'text-emerald-400', badge: 'bg-emerald-400/10 border-emerald-400/30' },
 };
-
-const CATEGORY_ICONS: Record<string, React.ReactNode> = {
-  All: <Layers className="w-4 h-4" />,
-  biome: <TreePine className="w-4 h-4" />,
-  spire: <TowerControl className="w-4 h-4" />,
-  hollow: <Castle className="w-4 h-4" />,
-  vault: <Gem className="w-4 h-4" />,
-  temple: <Sun className="w-4 h-4" />,
-  settlement: <Tent className="w-4 h-4" />,
-  mine: <Pickaxe className="w-4 h-4" />,
-  landmark: <Landmark className="w-4 h-4" />,
-  system: <Skull className="w-4 h-4" />,
-};
-
-const BIOME_MINI_ICONS: Record<string, React.ReactNode> = {
-  'Springlands': <TreePine className="w-3 h-3" />,
-  'Revelwood': <TreePine className="w-3 h-3" />,
-  'Nomad Highlands': <Mountain className="w-3 h-3" />,
-  'Kindlewastes': <Sun className="w-3 h-3" />,
-  'Albaneve Summits': <Snowflake className="w-3 h-3" />,
-  'Veilwater Basin': <Droplets className="w-3 h-3" />,
-};
-
-function biomeMiniIcon(biome: string) {
-  for (const key of Object.keys(BIOME_MINI_ICONS)) {
-    if (biome.includes(key)) return BIOME_MINI_ICONS[key];
-  }
-  return <MapPin className="w-3 h-3" />;
-}
 
 function LocationCard({ entry, onOpen }: { entry: LocationEntry; onOpen: (sub: string) => void }) {
-  const c = CATEGORY_COLORS[entry.category];
+  const meta = CATEGORY_META[entry.category];
   return (
     <button
       onClick={() => onOpen(entry.linkSub)}
-      className={`game-panel corner-decor transition-all hover:border-[var(--border-gold-light)] group text-left cursor-pointer ${c.border}`}
+      className={`game-panel corner-decor transition-all hover:border-[var(--border-gold-light)] group text-left w-full ${meta.badge}`}
     >
-      {/* Header */}
-      <div className="p-4 pb-2">
-        <div className="flex items-start justify-between mb-2">
-          <h3 className={`font-cinzel text-xs font-bold ${c.name} group-hover:brightness-125 transition-all leading-snug`}>
+      <div className="p-3">
+        <div className="flex items-start justify-between mb-1.5">
+          <h3 className="font-cinzel text-[11px] font-bold text-[var(--text-primary)] group-hover:text-[var(--text-gold)] transition-colors leading-tight">
             {entry.name}
           </h3>
-          <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
-            <span className={`w-1.5 h-1.5 rounded-full ${c.dot}`} />
-            <span className={`text-[9px] ${c.name}`}>{entry.typeLabel}</span>
-          </div>
+          {entry.levelRange && (
+            <span className="text-[9px] font-bold text-[var(--text-gold)] bg-[var(--bg-secondary)] px-1.5 py-0.5 rounded border border-[var(--border-gold-dim)] flex-shrink-0 ml-2">
+              Lv.{entry.levelRange}
+            </span>
+          )}
         </div>
-
-        {/* Level / Biome badges */}
-        <div className="flex items-center gap-2 mb-3 flex-wrap">
-          <span className="bg-[var(--bg-secondary)] text-[var(--text-gold)] px-2 py-0.5 rounded text-[10px] font-cinzel font-bold border border-[var(--border-gold-dim)]">
-            {entry.level}
+        <div className="flex items-center gap-2 mb-1.5">
+          <span className={`flex items-center gap-1 text-[9px] ${meta.color}`}>
+            {meta.icon}
+            {meta.label}
           </span>
-          <span className="text-[10px] text-[var(--text-muted)] flex items-center gap-1">
-            {biomeMiniIcon(entry.biome)} {entry.biome}
-          </span>
+          <span className="text-[9px] text-[var(--text-muted)]">{entry.region}</span>
         </div>
-      </div>
-
-      {/* Body */}
-      <div className="px-4 pb-3">
-        {/* Reward */}
-        <div className="flex items-start gap-2 mb-2 text-[10px]">
-          <Star className="w-3 h-3 text-[var(--text-gold)] flex-shrink-0 mt-0.5" />
-          <span className="text-[var(--text-gold)] font-medium leading-snug">{entry.reward}</span>
-        </div>
-
-        {/* Description */}
-        <p className="text-[10px] text-[var(--text-secondary)] italic leading-relaxed mb-2 line-clamp-3">
+        <p className="text-[10px] text-[var(--text-secondary)] leading-relaxed line-clamp-2">
           {entry.desc}
         </p>
-
-        {/* Source */}
-        <div className="text-[10px] pt-2 border-t border-[var(--border-gold-dim)]">
-          <span className="text-[var(--text-muted)]"><MapPin className="w-3 h-3 inline" /></span>
-          <span className="text-[var(--text-secondary)] ml-1">{entry.source}</span>
-        </div>
+        {entry.reward && (
+          <div className="flex items-center gap-1 mt-1.5 text-[9px]">
+            <Star className="w-2.5 h-2.5 text-yellow-400" />
+            <span className="text-[var(--text-muted)]">{entry.reward}</span>
+          </div>
+        )}
+        {entry.source && (
+          <div className="flex items-center gap-1 mt-0.5 text-[9px]">
+            <MapPin className="w-2.5 h-2.5 text-[var(--text-muted)]" />
+            <span className="text-[var(--text-muted)] italic">{entry.source}</span>
+          </div>
+        )}
       </div>
     </button>
   );
@@ -108,64 +70,17 @@ function LocationCard({ entry, onOpen }: { entry: LocationEntry; onOpen: (sub: s
 
 export default function MapHomePage() {
   const { navigate } = usePage();
-  const [activeCategory, setActiveCategory] = useState<LocationCategory | 'All'>('All');
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const stats = useMemo(() => {
-    const catCounts: Record<string, number> = {};
-    locationCategories.forEach(cat => {
-      if (cat.id !== 'All') {
-        catCounts[cat.id] = locationEntries.filter(e => e.category === cat.id).length;
-      }
-    });
-    return {
-      total: locationEntries.length,
-      biomes: catCounts['biome'] || 0,
-      spires: catCounts['spire'] || 0,
-      catCounts,
-    };
-  }, []);
-
-  const filteredEntries = useMemo(() => {
-    let filtered = locationEntries;
-    if (activeCategory !== 'All') {
-      filtered = filtered.filter(e => e.category === activeCategory);
-    }
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      filtered = filtered.filter(e =>
-        e.name.toLowerCase().includes(q) ||
-        e.biome.toLowerCase().includes(q) ||
-        e.typeLabel.toLowerCase().includes(q) ||
-        e.reward.toLowerCase().includes(q) ||
-        e.desc.toLowerCase().includes(q)
-      );
-    }
-    const catOrder: LocationCategory[] = ['biome', 'spire', 'hollow', 'vault', 'temple', 'settlement', 'mine', 'landmark', 'system'];
-    const biomeOrder = ['Springlands', 'Revelwood', 'Nomad Highlands', 'Kindlewastes', 'Albaneve Summits', 'Veilwater Basin'];
-    return [...filtered].sort((a, b) => {
-      const diff = catOrder.indexOf(a.category) - catOrder.indexOf(b.category);
-      if (diff !== 0) return diff;
-      // Biomes follow progression order; spires follow level order; the rest alphabetical
-      if (a.category === 'biome') return biomeOrder.indexOf(a.name) - biomeOrder.indexOf(b.name);
-      if (a.category === 'spire') return biomeOrder.findIndex(n => a.biome.includes(n)) - biomeOrder.findIndex(n => b.biome.includes(n));
-      return a.name.localeCompare(b.name);
-    });
-  }, [activeCategory, searchQuery]);
-
-  const openEntry = (sub: string) => navigate('map', sub);
 
   return (
     <PageLayout
       title="Map & Locations"
-      subtitle="All 6 biomes, 1,017 mapped POIs, 8 Ancient Spires, and every dungeon, vault, and landmark in Embervale"
+      subtitle="Key locations across 6 biomes — Ancient Spires, Hollow Halls, vaults, temples, mines, and settlements"
       icon={<Map className="w-6 h-6 text-[var(--text-gold)]" />}
     >
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 mb-6 text-xs text-[var(--text-muted)]">
         <button onClick={() => navigate('home')} className="flex items-center gap-1 hover:text-[var(--text-gold)] transition-colors">
-          <Home className="w-3 h-3" />
-          <span>Home</span>
+          <Home className="w-3 h-3" /><span>Home</span>
         </button>
         <ChevronRight className="w-3 h-3" />
         <span className="text-[var(--text-gold)]">Map & Locations</span>
@@ -174,17 +89,17 @@ export default function MapHomePage() {
       {/* Overview */}
       <div className="game-panel corner-decor p-6 mb-8">
         <p className="text-[var(--text-secondary)] text-sm leading-relaxed mb-4">
-          Embervale is a handcrafted world spanning <strong className="text-[var(--text-primary)]">6 distinct biomes</strong> from the
-          peaceful Springlands to the tropical Veilwater Basin. This database covers{' '}
-          <strong className="text-[var(--text-primary)]">{stats.total} key locations</strong> — every Ancient Spire, Hollow Halls,
-          Ancient Vault, Sun Temple, settlement, mine, and landmark — cross-referenced against the official wiki and the{' '}
-          <strong className="text-[var(--text-gold)]">1,017-marker interactive map census</strong>. Click any card to open its full guide.
+          Embervale spans <strong className="text-[var(--text-primary)]">6 distinct biomes</strong> from the rolling Springlands 
+          to the endgame Veilwater Basin. This database covers{' '}
+          <strong className="text-[var(--text-primary)]">{locationEntries.length} key locations</strong> — every Ancient Spire fast-travel point, 
+          all 9 Hollow Halls dungeons, every Ancient Vault and Survivor location, and{' '}
+          <strong className="text-[var(--text-gold)]">1,017-marker interactive map census</strong>. Pick a biome or guide below — the full searchable location database lives in <strong className="text-[var(--text-primary)]">Map Overview</strong>.
         </p>
         <div className="flex flex-wrap gap-2 text-[10px]">
-          <span className="px-2 py-1 rounded bg-green-400/10 text-green-400 border border-green-400/20">Starter → Endgame Lv 1-45</span>
-          <span className="px-2 py-1 rounded bg-blue-400/10 text-blue-400 border border-blue-400/20">8 Spires = Fast Travel</span>
-          <span className="px-2 py-1 rounded bg-red-400/10 text-red-400 border border-red-400/20">12 Named Bosses</span>
-          <span className="px-2 py-1 rounded bg-teal-400/10 text-teal-400 border border-teal-400/20">19 Elixir Wells = 57 Skill Points</span>
+          <span className="px-2 py-1 rounded bg-yellow-400/10 text-yellow-400 border border-yellow-400/20">6 Spires</span>
+          <span className="px-2 py-1 rounded bg-purple-400/10 text-purple-400 border border-purple-400/20">9 Hollow Halls</span>
+          <span className="px-2 py-1 rounded bg-blue-400/10 text-blue-400 border border-blue-400/20">6+ Vaults</span>
+          <span className="px-2 py-1 rounded bg-emerald-400/10 text-emerald-400 border border-emerald-400/20">6 Biomes</span>
         </div>
       </div>
 
@@ -195,104 +110,130 @@ export default function MapHomePage() {
           <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mt-1">Biomes</div>
         </div>
         <div className="game-panel corner-decor p-4 text-center">
-          <div className="text-2xl font-cinzel font-bold text-blue-400">1,017</div>
-          <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mt-1">Map Markers</div>
+          <div className="text-2xl font-cinzel font-bold text-yellow-400">6</div>
+          <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mt-1">Spires</div>
         </div>
         <div className="game-panel corner-decor p-4 text-center">
-          <div className="text-2xl font-cinzel font-bold text-purple-400">8</div>
-          <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mt-1">Ancient Spires</div>
+          <div className="text-2xl font-cinzel font-bold text-purple-400">9</div>
+          <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mt-1">Hollow Halls</div>
         </div>
         <div className="game-panel corner-decor p-4 text-center">
-          <div className="text-2xl font-cinzel font-bold text-green-400">{stats.total}</div>
+          <div className="text-2xl font-cinzel font-bold text-green-400">{locationEntries.length}</div>
           <div className="text-[10px] text-[var(--text-muted)] uppercase tracking-wider mt-1">Key Locations</div>
         </div>
       </div>
 
-      {/* Map guide pages */}
+      {/* Biome & guide pages */}
       <SubsectionCards
         page="map"
         sections={mapSubSections}
         images={mapImages}
-        heading="Map & Exploration Guides"
+        heading="Map Guides"
       />
+    </PageLayout>
+  );
+}
 
+/** Full key-location database — lives on the Map Overview sub-page (/map/map-overview) */
+export function LocationDatabase() {
+  const { navigate } = usePage();
+  const [activeCategory, setActiveCategory] = useState<LocationCategory | 'All'>('All');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const stats = useMemo(() => {
+    const spires = locationEntries.filter(e => e.category === 'spire').length;
+    const hollowHalls = locationEntries.filter(e => e.category === 'hollow').length;
+    const vaults = locationEntries.filter(e => e.category === 'vault').length;
+    const biomes = new Set(locationEntries.map(e => e.region)).size;
+    return { spires, hollowHalls, vaults, biomes, total: locationEntries.length };
+  }, []);
+
+  const filteredEntries = useMemo(() => {
+    return locationEntries.filter(entry => {
+      const matchesCategory = activeCategory === 'All' || entry.category === activeCategory;
+      const q = searchQuery.toLowerCase();
+      const matchesSearch = searchQuery === '' ||
+        entry.name.toLowerCase().includes(q) ||
+        entry.desc.toLowerCase().includes(q) ||
+        entry.region.toLowerCase().includes(q) ||
+        entry.reward?.toLowerCase().includes(q) ||
+        entry.source?.toLowerCase().includes(q);
+      return matchesCategory && matchesSearch;
+    });
+  }, [activeCategory, searchQuery]);
+
+  const openEntry = (sub: string) => navigate('map', sub);
+
+  return (
+    <div className="mt-8">
+      <h2 className="font-cinzel text-sm font-bold text-[var(--text-gold)] uppercase tracking-wider mb-3">
+        Key Locations Database
+      </h2>
       {/* Search */}
-      <div className="mb-6">
-        <input
-          type="text"
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-          placeholder="Search locations by name, biome, type, or reward..."
-          className="w-full bg-[var(--bg-secondary)] border border-[var(--border-gold-dim)] rounded-sm px-4 py-3 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--border-gold)]"
-        />
+      <div className="game-panel corner-decor p-4 mb-6">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" />
+          <input
+            type="text"
+            placeholder="Search locations, rewards, regions..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full bg-[var(--bg-secondary)] border border-[var(--border-gold-dim)] rounded pl-10 pr-4 py-2.5 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--text-gold)]/50"
+          />
+        </div>
       </div>
 
       {/* Category Tabs */}
       <div className="flex flex-wrap gap-2 mb-6">
-        {locationCategories.map(cat => {
-          const count = cat.id === 'All' ? stats.total : (stats.catCounts[cat.id] || 0);
+        <button
+          onClick={() => setActiveCategory('All')}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-cinzel font-bold uppercase tracking-wider transition-all border
+            ${activeCategory === 'All'
+              ? 'bg-[var(--text-gold)]/20 text-[var(--text-gold)] border-[var(--text-gold)]/30'
+              : 'bg-[var(--bg-secondary)] text-[var(--text-muted)] border-[var(--border-gold-dim)] hover:text-[var(--text-primary)] hover:border-[var(--border-gold-light)]'
+            }`}
+        >
+          <Compass className="w-3 h-3" />
+          All ({locationEntries.length})
+        </button>
+        {locationCategories.map((cat) => {
+          const meta = CATEGORY_META[cat];
+          const count = locationEntries.filter(e => e.category === cat).length;
           return (
             <button
-              key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
-              className={`px-3 py-1.5 rounded-sm text-[10px] font-cinzel font-bold uppercase tracking-wider transition-colors border flex items-center gap-1 ${
-                activeCategory === cat.id
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-cinzel font-bold uppercase tracking-wider transition-all border
+                ${activeCategory === cat
                   ? 'bg-[var(--text-gold)]/20 text-[var(--text-gold)] border-[var(--text-gold)]/30'
-                  : 'bg-[var(--bg-secondary)] text-[var(--text-muted)] border-[var(--border-gold-dim)] hover:text-[var(--text-primary)] hover:border-[var(--border-gold)]'
-              }`}
+                  : 'bg-[var(--bg-secondary)] text-[var(--text-muted)] border-[var(--border-gold-dim)] hover:text-[var(--text-primary)] hover:border-[var(--border-gold-light)]'
+                }`}
             >
-              {CATEGORY_ICONS[cat.id]} {cat.label} ({count})
+              {meta.icon}
+              {meta.label} ({count})
             </button>
           );
         })}
       </div>
 
-      {/* Results */}
+      {/* Results Count */}
       <div className="text-[10px] text-[var(--text-muted)] mb-4">
         Showing {filteredEntries.length} of {stats.total} key locations
-        {activeCategory !== 'All' && ` in ${locationCategories.find(c => c.id === activeCategory)?.label}`}
-        {searchQuery && ` matching "${searchQuery}"`}
       </div>
 
-      {/* Grid */}
+      {/* Location Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {filteredEntries.map(entry => (
-          <LocationCard key={entry.name} entry={entry} onOpen={openEntry} />
+          <LocationCard key={entry.id} entry={entry} onOpen={openEntry} />
         ))}
       </div>
 
       {filteredEntries.length === 0 && (
         <div className="text-center py-20 text-[var(--text-muted)]">
           <Map className="w-12 h-12 mx-auto mb-4 opacity-30" />
-          <p className="text-sm">No locations found matching your filters.</p>
+          <p className="text-sm">No locations found.</p>
         </div>
       )}
-
-      {/* Guide sections quick nav */}
-      <div className="mt-10 pt-6 border-t border-[var(--border-gold)]/20">
-        <h3 className="font-cinzel text-sm font-bold text-[var(--text-gold)] tracking-wider uppercase mb-4">Guide Chapters</h3>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          {[
-            { id: 'map-overview', label: 'Map Overview', desc: '1,017 markers · 43 categories' },
-            { id: 'key-locations', label: 'Key Locations', desc: 'Spires, Halls, Wells, Vaults' },
-            { id: 'fast-travel', label: 'Fast Travel', desc: 'Altars, Glider, Grappling Hook' },
-            { id: 'collectibles', label: 'Collectibles', desc: 'Fossils, relics, statue sets' },
-            { id: 'exploration-tips', label: 'Exploration Tips', desc: 'Shroud, weather, secrets' },
-          ].map(g => (
-            <button
-              key={g.id}
-              onClick={() => navigate('map', g.id)}
-              className="game-panel corner-decor p-3 text-left hover:border-[var(--border-gold-light)] transition-all group cursor-pointer"
-            >
-              <div className="font-cinzel text-xs font-bold text-[var(--text-primary)] group-hover:text-[var(--text-gold)] transition-colors flex items-center justify-between">
-                {g.label}
-                <ChevronRight className="w-3 h-3 text-[var(--text-muted)] group-hover:text-[var(--text-gold)]" />
-              </div>
-              <div className="text-[10px] text-[var(--text-muted)] mt-1">{g.desc}</div>
-            </button>
-          ))}
-        </div>
-      </div>
-    </PageLayout>
+    </div>
   );
 }
