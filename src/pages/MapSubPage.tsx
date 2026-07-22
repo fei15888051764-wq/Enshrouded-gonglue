@@ -6,6 +6,7 @@ import SectionGallery from '../components/SectionGallery';
 import SubPageHero from '../components/SubPageHero';
 import { mapImages } from '../data/mapWalkthroughImages';
 import { mapSubSections } from '../data/mapData';
+import { LocationDatabase } from './MapHomePage';
 
 interface MapSubPageProps {
   subId: string;
@@ -76,6 +77,7 @@ export default function MapSubPage({ subId }: MapSubPageProps) {
         </div>
         <SubPageHero images={mapImages[section.id]} />
         <div className="max-w-4xl">{section.content}</div>
+        {section.id === 'map-overview' && <LocationDatabase />}
         <SectionGallery images={mapImages[section.id]} skipFirst />
         <div className="mt-10 pt-6 border-t border-[var(--border-gold)]/20">
           <div className="flex items-center justify-between">
