@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { usePage } from '../App';
 import { Skull, ChevronRight, Home, ArrowUp } from 'lucide-react';
 import PageLayout from './PageLayout';
-import { enemiesSubSections } from '../data/enemiesData';
 import SectionGallery from '../components/SectionGallery';
 import SubPageHero from '../components/SubPageHero';
 import { enemiesImages } from '../data/bossesEnemiesImages';
+import { enemiesSubSections } from '../data/enemiesData';
+
 
 interface EnemiesSubPageProps {
   subId: string;
@@ -35,45 +36,43 @@ function SubNav({ activeId, onNavigate }: { activeId: string; onNavigate: (id: s
 
 export default function EnemiesSubPage({ subId }: EnemiesSubPageProps) {
   const { navigate } = usePage();
-  const [currentSubId, setCurrentSubId] = useState(subId);
   const [showTopBtn, setShowTopBtn] = useState(false);
 
-  useEffect(() => { setCurrentSubId(subId); }, [subId]);
   useEffect(() => {
     const handleScroll = () => setShowTopBtn(window.scrollY > 500);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleNav = (id: string) => { setCurrentSubId(id); window.scrollTo(0, 0); };
-  const section = enemiesSubSections.find((s) => s.id === currentSubId);
+  const handleNav = (id: string) => { navigate('enemies', id); };
+  const section = enemiesSubSections.find((s) => s.id === subId);
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
   if (!section) {
     return (
       <PageLayout title="Not Found" subtitle="" icon={<Skull className="w-6 h-6 text-[var(--text-gold)]" />}>
         <div className="game-panel corner-decor p-6 text-center">
-          <p className="text-[var(--text-secondary)] text-sm mb-4">This enemy topic could not be found.</p>
-          <button onClick={() => navigate('enemies')} className="game-btn px-4 py-2 text-xs">Back to Enemies</button>
+          <p className="text-[var(--text-secondary)] text-sm mb-4">This skill topic could not be found.</p>
+          <button onClick={() => navigate('enemies')} className="game-btn px-4 py-2 text-xs">Back to Enemies & Builds</button>
         </div>
       </PageLayout>
     );
   }
 
-  const idx = enemiesSubSections.findIndex((s) => s.id === currentSubId);
+  const idx = enemiesSubSections.findIndex((s) => s.id === subId);
   const prev = idx > 0 ? enemiesSubSections[idx - 1] : null;
   const next = idx < enemiesSubSections.length - 1 ? enemiesSubSections[idx + 1] : null;
 
   return (
-    <PageLayout title={section.title} subtitle="Enemies & Creatures" icon={<>{section.icon}</>}>
-      <SubNav activeId={currentSubId} onNavigate={handleNav} />
+    <PageLayout title={section.title} subtitle="Enemies & Builds" icon={<>{section.icon}</>}>
+      <SubNav activeId={subId} onNavigate={handleNav} />
       <div className="max-w-5xl mx-auto px-4 py-6">
         <div className="flex items-center gap-2 mb-6 text-xs text-[var(--text-muted)] flex-wrap">
           <button onClick={() => navigate('home')} className="flex items-center gap-1 hover:text-[var(--text-gold)] transition-colors">
             <Home className="w-3 h-3" /><span>Home</span>
           </button>
           <ChevronRight className="w-3 h-3" />
-          <button onClick={() => navigate('enemies')} className="hover:text-[var(--text-gold)] transition-colors">Bestiary</button>
+          <button onClick={() => navigate('enemies')} className="hover:text-[var(--text-gold)] transition-colors">Enemies</button>
           <ChevronRight className="w-3 h-3" />
           <span className="text-[var(--text-gold)]">{section.title}</span>
         </div>

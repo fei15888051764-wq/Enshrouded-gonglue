@@ -2,10 +2,13 @@ import { useState, useEffect } from 'react';
 import { usePage } from '../App';
 import { Crown, ChevronRight, Home, ArrowUp } from 'lucide-react';
 import PageLayout from './PageLayout';
-import { bossesSubSections } from '../data/bossesData';
 import SectionGallery from '../components/SectionGallery';
 import SubPageHero from '../components/SubPageHero';
 import { bossesImages } from '../data/bossesEnemiesImages';
+import { bossesSubSections } from '../data/bossesData';
+import { allBosses } from '../data/bossesDataUnified';
+import { getBossDetailKey } from '../data/bossDetailData';
+import { BossCard } from './BossesHomePage';
 
 interface BossesSubPageProps {
   subId: string;
@@ -35,38 +38,36 @@ function SubNav({ activeId, onNavigate }: { activeId: string; onNavigate: (id: s
 
 export default function BossesSubPage({ subId }: BossesSubPageProps) {
   const { navigate } = usePage();
-  const [currentSubId, setCurrentSubId] = useState(subId);
   const [showTopBtn, setShowTopBtn] = useState(false);
 
-  useEffect(() => { setCurrentSubId(subId); }, [subId]);
   useEffect(() => {
     const handleScroll = () => setShowTopBtn(window.scrollY > 500);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const handleNav = (id: string) => { setCurrentSubId(id); window.scrollTo(0, 0); };
-  const section = bossesSubSections.find((s) => s.id === currentSubId);
+  const handleNav = (id: string) => { navigate('bosses', id); };
+  const section = bossesSubSections.find((s) => s.id === subId);
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
   if (!section) {
     return (
       <PageLayout title="Not Found" subtitle="" icon={<Crown className="w-6 h-6 text-[var(--text-gold)]" />}>
         <div className="game-panel corner-decor p-6 text-center">
-          <p className="text-[var(--text-secondary)] text-sm mb-4">This boss topic could not be found.</p>
+          <p className="text-[var(--text-secondary)] text-sm mb-4">This boss guide could not be found.</p>
           <button onClick={() => navigate('bosses')} className="game-btn px-4 py-2 text-xs">Back to Bosses</button>
         </div>
       </PageLayout>
     );
   }
 
-  const idx = bossesSubSections.findIndex((s) => s.id === currentSubId);
+  const idx = bossesSubSections.findIndex((s) => s.id === subId);
   const prev = idx > 0 ? bossesSubSections[idx - 1] : null;
   const next = idx < bossesSubSections.length - 1 ? bossesSubSections[idx + 1] : null;
 
   return (
     <PageLayout title={section.title} subtitle="Bosses" icon={<>{section.icon}</>}>
-      <SubNav activeId={currentSubId} onNavigate={handleNav} />
+      <SubNav activeId={subId} onNavigate={handleNav} />
       <div className="max-w-5xl mx-auto px-4 py-6">
         <div className="flex items-center gap-2 mb-6 text-xs text-[var(--text-muted)] flex-wrap">
           <button onClick={() => navigate('home')} className="flex items-center gap-1 hover:text-[var(--text-gold)] transition-colors">
@@ -79,6 +80,18 @@ export default function BossesSubPage({ subId }: BossesSubPageProps) {
         </div>
         <SubPageHero images={bossesImages[section.id]} />
         <div className="max-w-4xl">{section.content}</div>
+        {section.id === 'boss-overview' && (
+          <div className="mt-8">
+            <h2 className="font-cinzel text-sm font-bold text-[var(--text-gold)] uppercase tracking-wider mb-3">
+              All {allBosses.length} Bosses — Full Directory
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {allBosses.map((b) => (
+                <BossCard key={b.name} boss={b} onClick={() => navigate('bosses', getBossDetailKey(b.name))} />
+              ))}
+            </div>
+          </div>
+        )}
         <SectionGallery images={bossesImages[section.id]} skipFirst />
         <div className="mt-10 pt-6 border-t border-[var(--border-gold)]/20">
           <div className="flex items-center justify-between">
