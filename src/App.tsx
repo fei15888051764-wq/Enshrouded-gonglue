@@ -1,92 +1,100 @@
-import { useState, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useNavigate, useParams, useLocation } from 'react-router-dom';
+import { createContext, useContext, useCallback, useEffect } from 'react';
+import { Routes, Route, useParams, useNavigate as useRouterNavigate, useLocation } from 'react-router-dom';
+import { getSeoMeta } from './data/seoMeta';
+import { SITE_URL } from './config';
 import HomePage from './sections/HomePage';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import PrivacyPage from './pages/PrivacyPage';
-import { pageMeta, applyPageMeta } from './data/seoMeta';
 import LoreHomePage from './pages/LoreHomePage';
 import LoreSubPage from './pages/LoreSubPage';
-import SkillsHomePage from './pages/SkillsHomePage';
-import SkillsSubPage from './pages/SkillsSubPage';
-import MechanicsHomePage from './pages/MechanicsHomePage';
-import MechanicsSubPage from './pages/MechanicsSubPage';
 import BeginnerHomePage from './pages/BeginnerHomePage';
 import BeginnerSubPage from './pages/BeginnerSubPage';
-import WalkthroughHomePage from './pages/WalkthroughHomePage';
-import WalkthroughSubPage from './pages/WalkthroughSubPage';
+import QuestsHomePage from './pages/QuestsHomePage';
+import QuestsSubPage from './pages/QuestsSubPage';
+import SkillsHomePage from './pages/SkillsHomePage';
+import SkillsSubPage from './pages/SkillsSubPage';
 import ItemsHomePage from './pages/ItemsHomePage';
 import ItemsSubPage from './pages/ItemsSubPage';
 import CraftingHomePage from './pages/CraftingHomePage';
 import CraftingSubPage from './pages/CraftingSubPage';
-import BaseBuildingHomePage from './pages/BaseBuildingHomePage';
-import BaseBuildingSubPage from './pages/BaseBuildingSubPage';
-import UpdatesHomePage from './pages/UpdatesHomePage';
-import UpdatesSubPage from './pages/UpdatesSubPage';
 import EnemiesHomePage from './pages/EnemiesHomePage';
 import EnemiesSubPage from './pages/EnemiesSubPage';
 import BossesHomePage from './pages/BossesHomePage';
 import BossesSubPage from './pages/BossesSubPage';
 import BossDetailPage from './pages/BossDetailPage';
-import { bossDetailData } from './data/bossDetailData';
-import QuestsHomePage from './pages/QuestsHomePage';
-import QuestsSubPage from './pages/QuestsSubPage';
+import { bossesSubSections } from './data/bossesData';
 import MapHomePage from './pages/MapHomePage';
 import MapSubPage from './pages/MapSubPage';
-import TipsHomePage from './pages/TipsHomePage';
-import TipsSubPage from './pages/TipsSubPage';
+import BaseHomePage from './pages/BaseHomePage';
+import BaseSubPage from './pages/BaseSubPage';
+import MechanicsHomePage from './pages/MechanicsHomePage';
+import MechanicsSubPage from './pages/MechanicsSubPage';
 import FishingHomePage from './pages/FishingHomePage';
 import FishingSubPage from './pages/FishingSubPage';
-import TroubleshootingHomePage from './pages/TroubleshootingHomePage';
-import TroubleshootingSubPage from './pages/TroubleshootingSubPage';
+import WalkthroughHomePage from './pages/WalkthroughHomePage';
+import WalkthroughSubPage from './pages/WalkthroughSubPage';
+import TipsHomePage from './pages/TipsHomePage';
+import TipsSubPage from './pages/TipsSubPage';
+import UpdatesHomePage from './pages/UpdatesHomePage';
+import UpdatesSubPage from './pages/UpdatesSubPage';
+import TroubleshootHomePage from './pages/TroubleshootHomePage';
+import TroubleshootSubPage from './pages/TroubleshootSubPage';
 import BuildHomePage from './pages/BuildHomePage';
 import BuildSubPage from './pages/BuildSubPage';
 import ArmorHomePage from './pages/ArmorHomePage';
 import ArmorSubPage from './pages/ArmorSubPage';
+import ScreenshotsHomePage from './pages/ScreenshotsHomePage';
+import ScreenshotsSubPage from './pages/ScreenshotsSubPage';
+import AboutPage from './pages/AboutPage';
+import DisclaimerPage from './pages/DisclaimerPage';
+import PrivacyPage from './pages/PrivacyPage';
 import WeaponsHomePage from './pages/WeaponsHomePage';
 import WeaponsSubPage from './pages/WeaponsSubPage';
 import ArmorPiecesHomePage from './pages/ArmorPiecesHomePage';
 import ArmorPiecesSubPage from './pages/ArmorPiecesSubPage';
-import ScreenshotsHomePage from './pages/ScreenshotsHomePage';
-import ScreenshotsSubPage from './pages/ScreenshotsSubPage';
 
-export interface PageContextType {
+interface PageContextType {
+  currentPage: string;
+  currentSub: string;
   navigate: (page: string, sub?: string) => void;
+  goBack: () => void;
 }
 
-import { createContext, useContext } from 'react';
-import GlobalSearch from './components/GlobalSearch';
-import { initAnalytics, trackPageView } from './utils/analytics';
-import { initWebVitals } from './utils/webVitals';
-import { initSEOMonitoring } from './utils/seoMonitoring';
-import { seoConfig } from './config/seo';
+export const PageContext = createContext<PageContextType>({
+  currentPage: 'home',
+  currentSub: '',
+  navigate: () => {},
+  goBack: () => {},
+});
 
-const PageContext = createContext<PageContextType>({ navigate: () => {} });
-export const usePage = () => useContext(PageContext);
+export function usePage() {
+  return useContext(PageContext);
+}
 
-/* ---- Simple page components (no sub-pages) ---- */
+// Top-level pages that don't have sub-pages
 const simplePages: Record<string, React.ComponentType> = {
+  home: HomePage,
+  about: AboutPage,
+  disclaimer: DisclaimerPage,
   privacy: PrivacyPage,
 };
 
-/* ---- Category home pages ---- */
+// Categories with sub-pages (new 3-layer architecture)
 const categoryHomePages: Record<string, React.ComponentType> = {
   lore: LoreHomePage,
-  skills: SkillsHomePage,
-  mechanics: MechanicsHomePage,
   beginner: BeginnerHomePage,
-  walkthrough: WalkthroughHomePage,
+  quests: QuestsHomePage,
+  skills: SkillsHomePage,
   items: ItemsHomePage,
   crafting: CraftingHomePage,
-  'base-building': BaseBuildingHomePage,
-  updates: UpdatesHomePage,
   enemies: EnemiesHomePage,
   bosses: BossesHomePage,
-  quests: QuestsHomePage,
   map: MapHomePage,
-  tips: TipsHomePage,
+  base: BaseHomePage,
+  mechanics: MechanicsHomePage,
   fishing: FishingHomePage,
-  troubleshooting: TroubleshootingHomePage,
+  walkthrough: WalkthroughHomePage,
+  tips: TipsHomePage,
+  updates: UpdatesHomePage,
+  troubleshoot: TroubleshootHomePage,
   builds: BuildHomePage,
   armor: ArmorHomePage,
   weaponsdb: WeaponsHomePage,
@@ -94,24 +102,28 @@ const categoryHomePages: Record<string, React.ComponentType> = {
   screenshots: ScreenshotsHomePage,
 };
 
-/* ---- Category sub pages ---- */
 const categorySubPages: Record<string, React.ComponentType<{ subId: string }>> = {
+  // Bosses has two page types sharing /bosses/:sub — guide subsections
+  // (early-bosses, boss-strategies…) vs individual boss detail pages
+  bosses: ({ subId }: { subId: string }) =>
+    bossesSubSections.some((s) => s.id === subId)
+      ? <BossesSubPage subId={subId} />
+      : <BossDetailPage bossName={subId} />,
   lore: LoreSubPage,
-  skills: SkillsSubPage,
-  mechanics: MechanicsSubPage,
   beginner: BeginnerSubPage,
-  walkthrough: WalkthroughSubPage,
+  quests: QuestsSubPage,
+  skills: SkillsSubPage,
   items: ItemsSubPage,
   crafting: CraftingSubPage,
-  'base-building': BaseBuildingSubPage,
-  updates: UpdatesSubPage,
   enemies: EnemiesSubPage,
-  bosses: BossesSubPage,
-  quests: QuestsSubPage,
   map: MapSubPage,
-  tips: TipsSubPage,
+  base: BaseSubPage,
+  mechanics: MechanicsSubPage,
   fishing: FishingSubPage,
-  troubleshooting: TroubleshootingSubPage,
+  walkthrough: WalkthroughSubPage,
+  tips: TipsSubPage,
+  updates: UpdatesSubPage,
+  troubleshoot: TroubleshootSubPage,
   builds: BuildSubPage,
   armor: ArmorSubPage,
   weaponsdb: WeaponsSubPage,
@@ -119,117 +131,129 @@ const categorySubPages: Record<string, React.ComponentType<{ subId: string }>> =
   screenshots: ScreenshotsSubPage,
 };
 
-/* ---- Resolve a sub-page component, with boss detail override ---- */
-function SubPageResolver({ page, sub }: { page: string; sub: string }) {
-  // Boss detail pages take priority over boss guide sections
-  if (page === 'bosses' && bossDetailData[sub]) {
-    return <BossDetailPage subId={sub} />;
-  }
-  const Component = categorySubPages[page];
-  if (!Component) return null;
-  return <Component subId={sub} />;
+function NotFoundPage() {
+  const { navigate } = usePage();
+  return (
+    <div className="game-bg min-h-screen flex items-center justify-center px-4">
+      <div className="game-panel corner-decor p-8 max-w-md w-full text-center">
+        <h1 className="font-cinzel text-2xl font-bold text-[var(--text-gold)] mb-3">404 — Lost in the Shroud</h1>
+        <p className="text-sm text-[var(--text-secondary)] mb-6 leading-relaxed">
+          This page doesn't exist. It may have been moved, or the URL is incorrect.
+        </p>
+        <button onClick={() => navigate('home')} className="game-btn px-5 py-2 text-xs font-cinzel tracking-wider">
+          Return to Homepage
+        </button>
+      </div>
+    </div>
+  );
 }
 
 function AppShell() {
-  const routerNavigate = useNavigate();
+  const { page = 'home', sub = '' } = useParams();
   const location = useLocation();
-  const { page: urlPage, sub: urlSub } = useParams<{ page?: string; sub?: string }>();
-  const currentPage = urlPage || 'home';
-  const currentSub = urlSub || undefined;
-  const [searchOpen, setSearchOpen] = useState(false);
+  const routerNavigate = useRouterNavigate();
 
-  const navigate = (page: string, sub?: string) => {
-    const path = page === 'home' ? '/' : sub ? `/${page}/${sub}` : `/${page}`;
-    routerNavigate(path);
-    window.scrollTo(0, 0);
-  };
+  const currentPage = page;
+  const currentSub = sub;
 
-  // Scroll to top on every route change (handles back/forward too)
+  // Unknown top-level routes must not render as soft-404s (Google penalty)
+  const knownPage =
+    currentPage === 'home' ||
+    !!categorySubPages[currentPage] ||
+    !!categoryHomePages[currentPage] ||
+    !!simplePages[currentPage];
+
+  // Scroll to top on every URL change
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
 
-  // Dynamic SEO meta tags per route (data-driven registry)
+  // Unique SEO metadata per route (title, description, OG, canonical)
   useEffect(() => {
-    applyPageMeta(pageMeta(currentPage, currentSub));
-    trackPageView(location.pathname);
-  }, [currentPage, currentSub, location.pathname]);
-
-  // Global search keyboard shortcut
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-        e.preventDefault();
-        setSearchOpen(true);
+    const meta = getSeoMeta(location.pathname);
+    document.title = meta.title;
+    const setMeta = (attr: string, key: string, content: string) => {
+      let el = document.head.querySelector(`meta[${attr}="${key}"]`);
+      if (!el) {
+        el = document.createElement('meta');
+        el.setAttribute(attr, key);
+        document.head.appendChild(el);
       }
+      el.setAttribute('content', content);
     };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, []);
+    const canonicalUrl = `${SITE_URL}${location.pathname === '/' ? '/' : location.pathname}`;
+    setMeta('name', 'description', meta.description);
+    setMeta('property', 'og:title', meta.title);
+    setMeta('property', 'og:description', meta.description);
+    setMeta('property', 'og:url', canonicalUrl);
+    setMeta('name', 'twitter:title', meta.title);
+    setMeta('name', 'twitter:description', meta.description);
+    const canonical = document.head.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+    if (canonical) canonical.href = canonicalUrl;
 
-  const renderContent = () => {
-    if (currentPage === 'home') {
-      return <HomePage onNavigate={navigate} />;
+    // Real 404 handling: noindex unknown routes instead of serving homepage content
+    let robots = document.head.querySelector('meta[name="robots"]');
+    if (!knownPage) {
+      document.title = 'Page Not Found — Enshrouded Guide';
+      if (!robots) {
+        robots = document.createElement('meta');
+        robots.setAttribute('name', 'robots');
+        document.head.appendChild(robots);
+      }
+      robots.setAttribute('content', 'noindex, follow');
+    } else if (robots) {
+      robots.remove();
     }
+  }, [location.pathname, knownPage]);
 
-    // Category with sub-page
-    if (currentSub && categorySubPages[currentPage]) {
-      return <SubPageResolver page={currentPage} sub={currentSub} />;
+  const navigate = useCallback((targetPage: string, targetSub: string = '') => {
+    if (targetPage === 'home' && !targetSub) {
+      routerNavigate('/');
+    } else {
+      routerNavigate(targetSub ? `/${targetPage}/${targetSub}` : `/${targetPage}`);
     }
+  }, [routerNavigate]);
 
-    // Category home
-    if (categoryHomePages[currentPage]) {
-      const Component = categoryHomePages[currentPage];
-      return <Component />;
+  const goBack = useCallback(() => {
+    const idx = (window.history.state as { idx?: number } | null)?.idx ?? 0;
+    if (idx > 0) {
+      routerNavigate(-1);
+    } else if (currentSub) {
+      // Landed directly on a sub-page — go up to its category
+      routerNavigate(`/${currentPage}`);
+    } else {
+      routerNavigate('/');
     }
+  }, [routerNavigate, currentPage, currentSub]);
 
-    // Simple pages
-    if (simplePages[currentPage]) {
-      const Component = simplePages[currentPage];
-      return <Component />;
-    }
+  // Determine which component to render
+  let PageComponent: React.ComponentType;
 
-    // Fallback
-    return <HomePage onNavigate={navigate} />;
-  };
+  if (currentSub && categorySubPages[currentPage]) {
+    const SubComponent = categorySubPages[currentPage];
+    PageComponent = () => <SubComponent subId={currentSub} />;
+  } else if (categoryHomePages[currentPage]) {
+    PageComponent = categoryHomePages[currentPage];
+  } else {
+    PageComponent = simplePages[currentPage] || NotFoundPage;
+  }
 
   return (
-    <PageContext.Provider value={{ navigate }}>
-      <div className="min-h-screen bg-[var(--bg-primary)] text-[var(--text-primary)]">
-        <Header
-          currentPage={currentPage}
-          currentSub={currentSub}
-          onNavigate={navigate}
-          onSearchOpen={() => setSearchOpen(true)}
-        />
-        <main>
-          {renderContent()}
-        </main>
-        <Footer onNavigate={navigate} />
-        <GlobalSearch
-          isOpen={searchOpen}
-          onClose={() => setSearchOpen(false)}
-          onNavigate={navigate}
-        />
-      </div>
+    <PageContext.Provider value={{ currentPage, currentSub, navigate, goBack }}>
+      <PageComponent />
     </PageContext.Provider>
   );
 }
 
-export default function App() {
-  useEffect(() => {
-    initAnalytics(seoConfig.gaId);
-    initWebVitals();
-    initSEOMonitoring();
-  }, []);
-
+function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<AppShell />} />
-        <Route path="/:page" element={<AppShell />} />
-        <Route path="/:page/:sub" element={<AppShell />} />
-      </Routes>
-    </BrowserRouter>
+    <Routes>
+      <Route path="/" element={<AppShell />} />
+      <Route path="/:page" element={<AppShell />} />
+      <Route path="/:page/:sub" element={<AppShell />} />
+      <Route path="*" element={<AppShell />} />
+    </Routes>
   );
 }
+
+export default App;
